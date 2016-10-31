@@ -6,5 +6,7 @@ settings = {
         (-10,10)
     ],
     'selection_multiplier': 0.85,
-    'selection_cutoff': 0.75
+    'selection_cutoff': 0.75,
+    'step_through': False,
+    'plot': True
 }
