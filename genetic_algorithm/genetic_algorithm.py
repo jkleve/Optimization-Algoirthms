@@ -29,6 +29,7 @@ class GA:
     total_organisms = 0
     population = []
     bounds = []
+    fig = None
 
     def __init__(self):
         self.num_dims        = settings['number_of_dimensions']
@@ -40,6 +41,22 @@ class GA:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
 
         self.init_population()
+
+        if settings['plot'] is True:
+            if self.num_dims > 2:
+                print("Can not plot more than 2 dimensions")
+                settings['plot'] = False
+            else:
+                self.fig, self.ax = plt.subplots()
+                self.line, = self.ax.plot([], [], 'ro')
+                self.ax.grid()
+                xlim_l = settings['bounds'][0][0]
+                xlim_u = settings['bounds'][0][1]
+                ylim_l = settings['bounds'][1][0]
+                ylim_u = settings['bounds'][1][1]
+                self.ax.set_xlim(xlim_l, xlim_u)
+                self.ax.set_ylim(ylim_l, ylim_u)
+                #plt.show()
 
     def init_population(self):
         for i in range(0, self.population_size):
@@ -58,9 +75,18 @@ class GA:
         population_values = [getattr(organism, 'f') for organism in self.population]
         max_val = max(population_values)
         min_val = min(population_values)
+
+        den = (max_val - min_val)
+        if den == 0:
+            print("Every organism has same objective function value.")
+
         for organism in self.population:
             v = getattr(organism, 'f')
-            prob = float(v - min_val) / (max_val - min_val)
+
+            # check for division by zero
+            if den == 0: prob = 0
+            else: prob = float(v - min_val) / den
+
             if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
                 self.population.remove(organism) # TODO this may be too slow but easy to read
 
@@ -118,7 +144,7 @@ class GA:
         self.population = new_population # TODO does this need to be a new list? possible bug
 
     def mutation(self):
-        print("implement")
+        print("implement mutation")
 
     def next_generation(self):
         # check we haven't hit a bug in the code
@@ -139,19 +165,18 @@ class GA:
             #input("Paused. Hit Enter to continue")
 
     def display_state(self):
-        print("implement")
+        print("implement display_state")
 
     def plot_state(self):
-        if self.num_dims > 2:
-            print("Can not plot more than 2 dimensions")
-            settings['plot'] = False
-
         x = [getattr(organism, 'pos')[0] for organism in self.population]
         y = [getattr(organism, 'pos')[1] for organism in self.population]
-        plt.plot(x,y, 'ro')
-        plt.show()
+        self.line.set_xdata(x)
+        self.line.set_ydata(y)
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
 
 if __name__ == "__main__":
+    plt.ion()
     ga = GA()
     while True:
         ga.next_generation()
