@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt # plotting
 import random # randint
 import sys # to exit
 import time # delay
+from math import log
 
 from ga_settings import settings
 from ga_objective_function import objective_function
@@ -30,6 +31,9 @@ class GA:
     population = []
     bounds = []
     fig = None
+    best_f = float("inf")
+    best_organism = None
+    num_generations = 0
 
     def __init__(self):
         self.num_dims        = settings['number_of_dimensions']
@@ -41,6 +45,9 @@ class GA:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
 
         self.init_population()
+        self.num_generations += 1
+        self.best_f = min([organism.f for organism in self.population])
+        self.best_organism = self.get_best_organism()
 
         if settings['plot'] is True:
             if self.num_dims > 2:
@@ -67,6 +74,13 @@ class GA:
     def get_rand_pos(self):
         b = self.bounds
         return [random.randint(b[i][0], b[i][1]) for i in range(0, self.num_dims)]
+
+    def get_best_organism(self):
+        best = None
+        for organism in self.population:
+            if best == None or best.f < organism.f:
+                best = organism
+        return best
 
     ###########################
     ###  GA steps and loop  ###
@@ -155,7 +169,25 @@ class GA:
         self.population = new_population # TODO does this need to be a new list? possible bug
 
     def mutation(self):
-        print("implement mutation")
+        for organism in self.population:
+            if random.random() < settings['mutation_rate']:
+                new_pos = []
+                for i in range(0, len(self.bounds)):
+                    # take some percentage of the max mutation amount
+                    x = random.uniform(0.01, 1.00)
+                    delta_pos = (-1.0*log(1-x))*settings['mutation_amount']
+                    # should we go positive or negative
+                    if random.randint(0,1) == 1: delta_pos = -1.0*delta_pos
+                    new_dim_pos = organism.pos[i] + delta_pos
+                    # cap where we can go if we are beyond the bounds of the design space
+                    if new_dim_pos < self.bounds[i][0]: new_dim_pos = self.bounds[i][0]
+                    elif new_dim_pos > self.bounds[i][1]: new_dim_pos = self.bounds[i][1]
+                    new_pos.append(new_dim_pos)
+
+                organism.pos = new_pos
+                if settings['debug']:
+                    print("Mutation: Moved organism %d to " % organism.id)
+                    print(new_pos)
 
     def next_generation(self):
         # check we haven't hit a bug in the code
@@ -166,6 +198,11 @@ class GA:
         self.selection()
         self.crossover()
         self.mutation()
+        self.num_generations += 1
+        self.best_organism = self.get_best_organism()
+        self.best_f = self.best_organism.f
+
+        print("The best f is %f by organism %d" % (self.best_f, self.best_organism.id))
 
         if settings['step_through'] is True:
             self.display_state()
@@ -189,8 +226,12 @@ class GA:
 if __name__ == "__main__":
     plt.ion()
     ga = GA()
-    while True:
+    print("The best f is %f" % ga.best_f)
+    while settings['num_generations'] > ga.num_generations:
         ga.next_generation()
         time.sleep(0.1)
 
+    print("The best f is %f" % ga.best_f)
+    print(ga.best_organism.id)
+    print(ga.best_organism.pos)
     sys.exit()
