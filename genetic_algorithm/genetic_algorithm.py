@@ -12,10 +12,6 @@ class Organism:
         self.id = id
         self.num_dims = num_dims
         self.pos = pos
-        print(id)
-        print(pos)
-        print(num_dims)
-        print('\n')
 
 class GA:
     num_dims = 0
@@ -27,6 +23,8 @@ class GA:
         self.num_dims = settings['number_of_dimensions']
         self.population_size = settings['population_size']
         self.bounds = settings['bounds']
+        if len(self.bounds) != self.num_dims:
+            raise ValueError("Number of dimensions doesn't match number of bounds provided")
         self.init_population()
 
     def init_population(self):
