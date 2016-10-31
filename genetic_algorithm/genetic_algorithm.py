@@ -122,13 +122,15 @@ class GA:
         return (Organism(id1, self.num_dims, pos1), Organism(id2, self.num_dims, pos2))
 
     # TODO a lot going on here. probably a good idea to test the different cases
+    # TODO i want to redo this. I think it will give better performance if breeding is
+    # random and the best have the highest chance of getting picked for breeding
     def crossover(self):
         # just do random partners for simplicity
         to_breed = list(self.population)
         pop_size = len(to_breed)
         new_population = []
 
-        # bread each parent once
+        # breed each parent once
         while len(to_breed) > 1:
             p1 = to_breed[random.randint(0,pop_size-1)]
             to_breed.remove(p1)
@@ -142,7 +144,7 @@ class GA:
 
         pop_size = len(self.population)
 
-        # if we missed a parent, bread them with a rando
+        # if we missed a parent, breed them with a rando
         if len(to_breed) > 0:
             p1 = to_breed[0]
             p2 = self.population[random.randint(0,pop_size-1)]
