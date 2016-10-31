@@ -1,12 +1,13 @@
 settings = {
-    'population_size': 5,
+    'population_size': 20,
     'number_of_dimensions': 2,
     'bounds': [
         (-10,10),
         (-10,10)
     ],
     'selection_multiplier': 0.85,
-    'selection_cutoff': 0.75,
+    'selection_cutoff': 0.5,
     'step_through': False,
-    'plot': True
+    'plot': True,
+    'debug': True
 }

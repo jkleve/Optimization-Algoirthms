@@ -88,6 +88,10 @@ class GA:
             else: prob = float(v - min_val) / den
 
             if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
+                if settings['debug']:
+                    id = getattr(organism, 'id')
+                    f = getattr(organism, 'f')
+                    print("Selection: Removing organism %d with val %f" % (id,f))
                 self.population.remove(organism) # TODO this may be too slow but easy to read
 
     def new_organism(self, parent1, parent2):
@@ -100,6 +104,7 @@ class GA:
         id1 = self.total_organisms + 1
         id2 = self.total_organisms + 2
         self.total_organisms += 2
+
         return (Organism(id1, self.num_dims, pos1), Organism(id2, self.num_dims, pos2))
 
     # TODO a lot going on here. probably a good idea to test the different cases
@@ -140,6 +145,12 @@ class GA:
             # choose only one of the childs to be used
             if random.randint(0,1) == 0: new_population.append(child1)
             else: new_population.append(child2)
+
+        if settings['debug']:
+            for organism in new_population:
+                id = getattr(organism, 'id')
+                f = getattr(organism, 'f')
+                print("Crossover: New oganism %d with val %f" % (id,f))
 
         self.population = new_population # TODO does this need to be a new list? possible bug
 
