@@ -47,15 +47,24 @@ class GA:
         b = self.bounds
         return [random.randint(b[i][0], b[i][1]) for i in range(0, self.num_dims)]
 
+    ###########################
+    ###  GA steps and loop  ###
+    ###########################
+    def selection(self):
+        population_values = [getattr(organism, 'f') for organism in self.population]
+        max_val = max(population_values)
+        min_val = min(population_values)
+        for organism in self.population:
+            v = getattr(organism, 'f')
+            prob = float(v - min_val) / (max_val - min_val)
+            if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
+                self.population.remove(organism) # TODO this may be too slow but easy to read
+
     def next_generation(self):
-        print("to implement ...")
+        self.selection()
 
 if __name__ == "__main__":
     ga = GA()
-    sys.exit()
-
-    params = []
-    params.append(2)
-    params.append(3)
-    print(func(params))
+    ga.next_generation()
+    print(getattr(ga, 'population'))
     sys.exit()
