@@ -12,6 +12,8 @@ class Organism:
         self.id = id
         self.num_dims = num_dims
         self.pos = pos
+        print(id)
+        print(pos)
 
 class GA:
     num_dims = 0
@@ -20,11 +22,14 @@ class GA:
     bounds = []
 
     def __init__(self):
-        self.num_dims = settings['number_of_dimensions']
+        self.num_dims        = settings['number_of_dimensions']
         self.population_size = settings['population_size']
-        self.bounds = settings['bounds']
+        self.bounds          = settings['bounds']
+
+        # check to make sure num_dims and number of bounds provided match
         if len(self.bounds) != self.num_dims:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
+
         self.init_population()
 
     def init_population(self):
@@ -33,12 +38,8 @@ class GA:
             self.population.append(Organism(i+1, self.num_dims, pos))
 
     def get_rand_pos(self):
-        pos = []
-        for i in range(0, self.num_dims):
-            lower = self.bounds[i][0]
-            upper = self.bounds[i][1]
-            pos.append(random.randint(lower, upper))
-        return pos
+        b = self.bounds
+        return [random.randint(b[i][0], b[i][1]) for i in range(0, self.num_dims)]
 
 if __name__ == "__main__":
     ga = GA()
