@@ -5,7 +5,6 @@ settings = {
         (-10,10),
         (-10,10)
     ],
-    'selection_multiplier': 0.85,
     'selection_cutoff': 0.8,
     'mutation_rate': 0.1, # how often a mutation happens (between 0 and 1)
     'mutation_amount': 0.4, # how large of a mutation is allowed (between 0 and 1)

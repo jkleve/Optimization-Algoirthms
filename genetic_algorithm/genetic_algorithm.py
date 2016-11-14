@@ -127,15 +127,16 @@ class GA:
 
         return population # TODO test that this is still sorted
 
-    def __mate_organisms(self, parent1, parent2):
+    @staticmethod
+    def __mate_organisms(id, parent1, parent2):
         pos1 = parent1.pos
         pos2 = parent2.pos
         n = len(pos1)
         split = random.randint(0, n-1)
         pos1 = pos1[0:split] + pos2[split:]
         pos2 = pos2[0:split] + pos1[split:]
-        id1 = self.total_organisms + 1
-        id2 = self.total_organisms + 2
+        id1 = id + 1
+        id2 = total_organisms + 2
         self.total_organisms += 2
 
         return (Organism(id1, pos1), Organism(id2, pos2))
@@ -143,9 +144,21 @@ class GA:
     # TODO a lot going on here. probably a good idea to test the different cases
     # TODO i want to redo this. I think it will give better performance if breeding is
     # random and the best have the highest chance of getting picked for breeding
-    def __crossover(self):
+    @staticmethod
+    def __crossover(population, size, debug=False):
+        sum = 0
+        for i, o in enumerate(population):
+            sum += o.fitness
+            print("%d: %6.2f" % (i,o.fitness))
+        print("sum is %6.2f" % sum)
+        n = random.randint(0, sum)
+
+        sys.exit()
+
+        # select to parents
+
         # just do random partners for simplicity
-        to_breed = list(self.population)
+        to_breed = list(population)
         pop_size = len(to_breed)
         new_population = []
 
@@ -157,37 +170,37 @@ class GA:
             p2 = to_breed[random.randint(0,pop_size-1)]
             to_breed.remove(p2)
             pop_size = len(to_breed)
-            child1, child2 = self.__mate_organisms(p1, p2)
+            child1, child2 = GA.__mate_organisms(p1, p2)
             new_population.append(child1)
             new_population.append(child2)
 
-        pop_size = len(self.population)
+        pop_size = len(population)
 
         # if we missed a parent, breed them with a rando
         if len(to_breed) > 0:
             p1 = to_breed[0]
-            p2 = self.population[random.randint(0,pop_size-1)]
-            child1, child2 = self.__mate_organisms(p1, p2)
+            p2 = population[random.randint(0,pop_size-1)]
+            child1, child2 = GA.__mate_organisms(p1, p2)
             # choose only one of the childs to be used
             if random.randint(0,1) == 0: new_population.append(child1)
             else: new_population.append(child2)
 
         # continue getting more offspring until we reach our population size
-        while len(new_population) < self.population_size:
-            p1 = self.population[random.randint(0,pop_size-1)]
-            p2 = self.population[random.randint(0,pop_size-1)]
-            child1, child2 = self.__mate_organisms(p1, p2)
+        while len(new_population) < population_size:
+            p1 = GA.population[random.randint(0,pop_size-1)]
+            p2 = GA.population[random.randint(0,pop_size-1)]
+            child1, child2 = GA.__mate_organisms(p1, p2)
             # choose only one of the childs to be used
             if random.randint(0,1) == 0: new_population.append(child1)
             else: new_population.append(child2)
 
-        if settings['debug']:
+        if debug:
             for organism in new_population:
                 id = organism.id
                 f  = organism.fitness
                 print("Crossover: New oganism %d with val %f" % (id,f))
 
-        self.population = new_population # TODO does this need to be a new list? possible bug
+        return new_population # TODO does this need to be a new list? possible bug
 
     def __mutation(self):
         for organism in self.population:
@@ -240,8 +253,8 @@ class GA:
 
         # TODO change crossover and mutation to accept population and
         # return an array
+        population = GA.__crossover(population, self.settings['population_size'])
         self.population = population
-        self.__crossover()
         self.__mutation()
 
         #self.population = population
