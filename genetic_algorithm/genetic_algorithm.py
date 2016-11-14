@@ -40,7 +40,7 @@ class GA:
         directory as this file
     """
 
-    def __init__(self):
+    def __init__(self): # TODO add settings parameter
         # read in settings
         num_dims        = settings['number_of_dimensions']
         population_size = settings['population_size']
@@ -51,9 +51,12 @@ class GA:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
 
         # set instance variables
+        self.settings        = settings
+        # TODO move away from these next 3 vars
         self.num_dims        = num_dims
         self.population_size = population_size
         self.bounds          = bounds
+
         self.population      = GA.__gen_population(bounds, population_size)
         self.total_organisms = len(self.population)
         self.num_generations = 1
@@ -92,33 +95,36 @@ class GA:
     1. have a setting that says we kill of last 20% of array or population
     2. the further you are down the array the higher your probability of dieing
     3. kill off the worst based on their distance from the best
+    TODO write a test for this. simple 10 population w/ .5 cutoff test will do
     '''
     @staticmethod
-    def __selection(population):
+    def __selection(population, cutoff, debug=False):
         size    = len(population)
-        max_val = population[0].fitness
-        min_val = population[size-1].fitness
+        max_f = population[0].fitness
+        min_f = population[size-1].fitness
 
         # denominator in probability of surviving
-        den = (max_val - min_val)
+        den = (max_f - min_f)
+        if den == 0:
+            print("Every organism has same objective function value.")
 
         for (i, organism) in enumerate(population):
-            v = organism.fitness
+            f = organism.fitness
 
             # check for division by zero
             if den == 0:
-                print("Every organism has same objective function value.")
-                prob = 0
+                normalized_f = 0
             else: # get normalized value
-                prob = float(v - min_val) / den
+                normalized_f = float(f - min_f) / den
 
-            if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
-                if settings['debug']:
-                    id = organism.id
-                    f = organism.fitness
-                    print("Selection: Deleting organism %d with val %f" % (id,f))
+            if normalized_f > cutoff:
                 # delete the organism from the population
                 del population[i]
+
+                if debug:
+                    id = organism.id
+                    print("Selection: Deleting organism %d with val %f" % (id,f))
+
         return population # TODO test that this is still sorted
 
     def __mate_organisms(self, parent1, parent2):
@@ -230,7 +236,7 @@ class GA:
 
         population = self.population
 
-        population = GA.__selection(population)
+        population = GA.__selection(population, self.settings['selection_cutoff'])
 
         # TODO change crossover and mutation to accept population and
         # return an array
