@@ -268,7 +268,8 @@ class GA:
         #self.population = population
         self.num_generations += 1
 
-        self.best_x = self.population[0]
+        if self.population[0].fitness < self.best_x.fitness:
+            self.best_x = self.population[0]
 
         print("The best f is %f by organism %d" % (self.get_best_f(), \
                                                    self.get_best_x().id))
