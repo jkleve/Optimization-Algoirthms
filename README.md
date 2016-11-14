@@ -8,7 +8,10 @@
 
 
 #### genetic_algorithm/
-##### To run 'cd genetic_algorithm' then 'python genetic_algorithm.py'
+To run
+```
+python genetic_algorithm.py
+```
 * ga_objective_function.py
     - contains the function being minimized for the algorithm
 * ga_settings.py
