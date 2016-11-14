@@ -58,6 +58,8 @@ class GA:
         self.total_organisms = len(self.population)
         self.num_generations = 1
 
+        self.best_x = self.population[0]
+
         if settings['plot']:
             try:
                 self.plotutils = PlotUtils(num_dims, bounds)
@@ -215,10 +217,10 @@ class GA:
     # class                            #
     ####################################
     def get_best_x(self):
-        return self.population[0]
+        return self.best_x
 
     def get_best_f(self):
-        return self.population[0].fitness
+        return self.best_x.fitness
 
     def do_loop(self):
         # check we haven't hit a bug in the code
