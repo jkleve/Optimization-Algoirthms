@@ -10,10 +10,6 @@ from ga_settings import settings
 from ga_objective_function import objective_function
 
 class Organism:
-    id = 0
-    pos = []
-    f = 0
-    func = None
 
     def __init__(self, id, pos, func=objective_function):
         self.id = id
