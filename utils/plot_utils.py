@@ -45,7 +45,7 @@ if __name__ == "__main__":
     pu = PlotUtils(2, [(-10,10),(-10,10)])
     pu.plot(data)
 
-if PY3:
-    input("Waiting for Enter to be pressed ...")
-else:
-    raw_input("Waiting for Enter to be pressed ...")
+    if PY3:
+        input("Waiting for Enter to be pressed ...")
+    else:
+        raw_input("Waiting for Enter to be pressed ...")
