@@ -207,26 +207,34 @@ class GA:
 
         return new_population
 
-    def __mutation(self):
-        for organism in self.population:
-            if random.random() < settings['mutation_rate']:
+    @staticmethod
+    def __mutation(population, bounds, rate, max_mutation_amount, debug=False):
+        for organism in population:
+            if random.random() < rate:
                 new_pos = []
-                for i in range(0, len(self.bounds)):
+                # for each dimension
+                for i in range(0, len(bounds)):
                     # take some percentage of the max mutation amount
                     x = random.uniform(0.01, 1.00)
-                    delta_pos = (-1.0*log(1-x))*settings['mutation_amount']
+                    delta_pos = (-1.0*log(1-x))*max_mutation_amount
                     # should we go positive or negative
                     if random.randint(0,1) == 1: delta_pos = -1.0*delta_pos
                     new_dim_pos = organism.pos[i] + delta_pos
                     # cap where we can go if we are beyond the bounds of the design space
-                    if new_dim_pos < self.bounds[i][0]: new_dim_pos = self.bounds[i][0]
-                    elif new_dim_pos > self.bounds[i][1]: new_dim_pos = self.bounds[i][1]
+                    if new_dim_pos < bounds[i][0]:
+                        new_dim_pos = bounds[i][0]
+                    elif new_dim_pos > bounds[i][1]:
+                        new_dim_pos = bounds[i][1]
+
                     new_pos.append(new_dim_pos)
 
                 organism.pos = new_pos
-                if settings['debug']:
+
+                if debug:
                     print("Mutation: Moved organism %d to " % organism.id)
                     print(new_pos)
+
+        return population
 
     def __display_state(self):
         print("implement display_state")
@@ -256,16 +264,13 @@ class GA:
 
         population = GA.__selection(population, self.settings['selection_cutoff'])
 
-        # TODO change crossover and mutation to accept population and
-        # return an array
         population = GA.__crossover(self.total_organisms, population, self.settings['population_size'])
         self.total_organisms += len(population)
-        self.population = population
-        self.__mutation()
 
-        self.population = GA.__sort_population(self.population)
+        population = GA.__mutation(population, self.bounds, settings['mutation_rate'], \
+                      settings['max_mutation_amount'])
 
-        #self.population = population
+        self.population = GA.__sort_population(population)
         self.num_generations += 1
 
         if self.population[0].fitness < self.best_x.fitness:
