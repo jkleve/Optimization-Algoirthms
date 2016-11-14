@@ -213,13 +213,13 @@ class GA:
     # should be called outside of this #
     # class                            #
     ####################################
-    def get_best_organism(self):
+    def get_best_x(self):
         return self.population[0]
 
-    def get_best_fitness(self):
+    def get_best_f(self):
         return self.population[0].fitness
 
-    def next_generation(self):
+    def do_loop(self):
         # check we haven't hit a bug in the code
         if self.population_size != len(self.population):
             raise ValueError("We somehow lost track of the population. size=%d, actual=%d" \
@@ -238,8 +238,8 @@ class GA:
         #self.population = population
         self.num_generations += 1
 
-        print("The best f is %f by organism %d" % (self.get_best_fitness(), \
-                                                   self.get_best_organism().id))
+        print("The best f is %f by organism %d" % (self.get_best_f(), \
+                                                   self.get_best_x().id))
 
         if settings['step_through']:
             #self.__display_state()
@@ -251,12 +251,12 @@ class GA:
 
 if __name__ == "__main__":
     ga = GA()
-    print("The best f is %f" % ga.get_best_fitness())
+    print("The best f is %f" % ga.get_best_f())
     while settings['num_generations'] > ga.num_generations:
-        ga.next_generation()
+        ga.do_loop()
         time.sleep(0.01)
 
-    print("The best f is %f" % ga.get_best_fitness())
-    print(ga.get_best_organism().id)
-    print(ga.get_best_organism().pos)
+    print("The best f is %f" % ga.get_best_f())
+    print(ga.get_best_x().id)
+    print(ga.get_best_x().pos)
     sys.exit()
