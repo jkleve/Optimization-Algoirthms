@@ -5,6 +5,7 @@ from math import log
 import sys # to exit and append to path
 sys.path.append('../utils')
 
+import oa_utils # optimization algorithm utils
 from plot_utils import PlotUtils
 from ga_settings import settings
 from ga_objective_function import objective_function
@@ -48,8 +49,12 @@ class GA:
         if len(self.bounds) != self.num_dims:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
 
+        # create empty array for storing population
+        self.population = []
+        self.total_organisms = 0
+
         self.init_population()
-        self.num_generations += 1
+        self.num_generations = 1
         self.best_f = min([organism.f for organism in self.population])
         self.best_organism = self.get_best_organism()
 
@@ -62,13 +67,9 @@ class GA:
 
     def init_population(self):
         for i in range(0, self.population_size):
-            pos = self.get_rand_pos()
+            pos = oa_utils.gen_random_numbers(self.bounds)
             self.population.append(Organism(i+1, pos, objective_function))
             self.total_organisms += 1
-
-    def get_rand_pos(self):
-        b = self.bounds
-        return [random.randint(b[i][0], b[i][1]) for i in range(0, self.num_dims)]
 
     def get_best_organism(self):
         best = None
