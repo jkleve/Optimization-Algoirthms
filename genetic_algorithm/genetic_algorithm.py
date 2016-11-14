@@ -38,6 +38,8 @@ class GA:
         There are not attributes for this class. All settings/attributes
         are read in from ga_settings.py which should be located in the same
         directory as this file
+
+    NOTE: The GA methods assume the population is always sorted
     """
 
     def __init__(self): # TODO add settings parameter
@@ -128,71 +130,74 @@ class GA:
         return population # TODO test that this is still sorted
 
     @staticmethod
-    def __mate_organisms(id, parent1, parent2):
-        pos1 = parent1.pos
-        pos2 = parent2.pos
-        n = len(pos1)
-        split = random.randint(0, n-1)
-        pos1 = pos1[0:split] + pos2[split:]
-        pos2 = pos2[0:split] + pos1[split:]
-        id1 = id + 1
-        id2 = total_organisms + 2
-        self.total_organisms += 2
+    def __get_parent_index(cdf_value, arr):
+        norm_sum = 0
+        for i, o in enumerate(arr):
+            norm_sum += o['probability']
+            if norm_sum >= cdf_value:
+                return i
+        return -1
 
+    @staticmethod
+    def __mate_parents(id, parent1, parent2):
+        n = len(parent1.pos)
+        # randomly choose split position
+        split = random.randint(0, n-1)
+        # split parent positions
+        pos1 = parent1.pos[0:split] + parent2.pos[split:]
+        pos2 = parent2.pos[0:split] + parent1.pos[split:]
+        # get id numbers
+        id1 = id + 1
+        id2 = id + 2
+        # return the two newly created organisms
         return (Organism(id1, pos1), Organism(id2, pos2))
 
     # TODO a lot going on here. probably a good idea to test the different cases
     # TODO i want to redo this. I think it will give better performance if breeding is
     # random and the best have the highest chance of getting picked for breeding
+    """
+        population: population
+        size: size that the population should be after crossover
+        NOTE: population must be sorted. crossover will return an unsorted
+              array of the new population.
+    """
     @staticmethod
-    def __crossover(population, size, debug=False):
-        sum = 0
-        for i, o in enumerate(population):
-            sum += o.fitness
-            print("%d: %6.2f" % (i,o.fitness))
-        print("sum is %6.2f" % sum)
-        n = random.randint(0, sum)
-
-        sys.exit()
-
-        # select to parents
-
-        # just do random partners for simplicity
-        to_breed = list(population)
-        pop_size = len(to_breed)
+    def __crossover(id, population, size, debug=False):
         new_population = []
+        length = len(population)
+        max_f = population[length-1].fitness
+        min_f = population[0].fitness
 
-        # breed each parent once
-        while len(to_breed) > 1:
-            p1 = to_breed[random.randint(0,pop_size-1)]
-            to_breed.remove(p1)
-            pop_size = len(to_breed)
-            p2 = to_breed[random.randint(0,pop_size-1)]
-            to_breed.remove(p2)
-            pop_size = len(to_breed)
-            child1, child2 = GA.__mate_organisms(p1, p2)
-            new_population.append(child1)
-            new_population.append(child2)
+        # if size is odd
+        if size % 2 == 1:
+            raise ValueError("Populations with an odd size hasn't been implemented. Talk to Jesse")
 
-        pop_size = len(population)
+        # get inversed normalized values of fitness
+        # normalized value of 1 is the best. 0 is the worst
+        probabilities = []
+        normalized_sum = 0.0
+        for o in population:
+            normalized_f = (max_f - o.fitness)/(max_f - min_f)
+            normalized_sum += normalized_f
+            probabilities.append({'normalized_f': normalized_f})
 
-        # if we missed a parent, breed them with a rando
-        if len(to_breed) > 0:
-            p1 = to_breed[0]
-            p2 = population[random.randint(0,pop_size-1)]
-            child1, child2 = GA.__mate_organisms(p1, p2)
-            # choose only one of the childs to be used
-            if random.randint(0,1) == 0: new_population.append(child1)
-            else: new_population.append(child2)
+        # calculate weight of each normalized value
+        for i, p in enumerate(probabilities):
+            probabilities[i]['probability'] = probabilities[i]['normalized_f']/normalized_sum
 
-        # continue getting more offspring until we reach our population size
-        while len(new_population) < population_size:
-            p1 = GA.population[random.randint(0,pop_size-1)]
-            p2 = GA.population[random.randint(0,pop_size-1)]
-            child1, child2 = GA.__mate_organisms(p1, p2)
-            # choose only one of the childs to be used
-            if random.randint(0,1) == 0: new_population.append(child1)
-            else: new_population.append(child2)
+        # generate new population
+        while len(new_population) < size:
+            # get cdf input values
+            cdf1 = random.random()
+            cdf2 = random.random()
+            # get index of parent from output of cdf
+            i = GA.__get_parent_index(cdf1, probabilities)
+            j = GA.__get_parent_index(cdf2, probabilities)
+            # mate parents
+            child1, child2 = GA.__mate_parents(id, population[i], population[j])
+            id += 2
+            # append children to new_population
+            new_population.extend((child1, child2))
 
         if debug:
             for organism in new_population:
@@ -200,7 +205,7 @@ class GA:
                 f  = organism.fitness
                 print("Crossover: New oganism %d with val %f" % (id,f))
 
-        return new_population # TODO does this need to be a new list? possible bug
+        return new_population
 
     def __mutation(self):
         for organism in self.population:
@@ -253,12 +258,17 @@ class GA:
 
         # TODO change crossover and mutation to accept population and
         # return an array
-        population = GA.__crossover(population, self.settings['population_size'])
+        population = GA.__crossover(self.total_organisms, population, self.settings['population_size'])
+        self.total_organisms += len(population)
         self.population = population
         self.__mutation()
 
+        self.population = GA.__sort_population(self.population)
+
         #self.population = population
         self.num_generations += 1
+
+        self.best_x = self.population[0]
 
         print("The best f is %f by organism %d" % (self.get_best_f(), \
                                                    self.get_best_x().id))
