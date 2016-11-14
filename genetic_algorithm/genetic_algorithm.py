@@ -70,6 +70,10 @@ class GA:
             pos = oa_utils.gen_random_numbers(self.bounds)
             self.population.append(Organism(i+1, pos, objective_function))
             self.total_organisms += 1
+        self.population = self.sort_population(self.population)
+
+    def sort_population(self, p):
+        return sorted(p, key=lambda o: o.f)
 
     def get_best_organism(self):
         best = None
