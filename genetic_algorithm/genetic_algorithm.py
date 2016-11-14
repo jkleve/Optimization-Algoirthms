@@ -233,13 +233,12 @@ class GA:
         print("The best f is %f by organism %d" % (self.get_best_fitness(), \
                                                    self.get_best_organism().id))
 
-        if settings['step_through'] is True:
+        if settings['step_through']:
             self.__display_state()
-            input("Paused. Hit Enter to continue")
+            oa_utils.pause()
 
-        if settings['plot'] is True:
+        if settings['plot']:
             self.__plot_state()
-            #input("Paused. Hit Enter to continue")
 
 
 if __name__ == "__main__":
