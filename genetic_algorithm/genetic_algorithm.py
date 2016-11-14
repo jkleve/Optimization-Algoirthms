@@ -99,15 +99,16 @@ class GA:
 
         # denominator in probability of surviving
         den = (max_val - min_val)
-        if den == 0:
-            print("Every organism has same objective function value.")
 
         for (i, organism) in enumerate(population):
             v = organism.fitness
 
             # check for division by zero
-            if den == 0: prob = 0
-            else: prob = float(v - min_val) / den
+            if den == 0:
+                print("Every organism has same objective function value.")
+                prob = 0
+            else: # get normalized value
+                prob = float(v - min_val) / den
 
             if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
                 if settings['debug']:
