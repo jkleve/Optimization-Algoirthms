@@ -54,7 +54,7 @@ class GA:
         self.num_dims        = num_dims
         self.population_size = population_size
         self.bounds          = bounds
-        self.population      = GA.gen_population(bounds, population_size)
+        self.population      = GA.__gen_population(bounds, population_size)
         self.total_organisms = len(self.population)
         self.num_generations = 1
 
@@ -66,26 +66,20 @@ class GA:
                 settings['plot'] = False
 
     @staticmethod
-    def gen_organism(id, bounds):
+    def __gen_organism(id, bounds):
         # use gen_random_numbers to get a list of positions within the bounds
         return Organism(id, oa_utils.gen_random_numbers(bounds))
 
     @staticmethod
-    def gen_population(bounds, size):
+    def __gen_population(bounds, size):
         b = bounds
         # generate a list of organisms
-        p = [GA.gen_organism(i+1, b) for i in range(0, size)]
-        return GA.sort_population(p)
+        p = [GA.__gen_organism(i+1, b) for i in range(0, size)]
+        return GA.__sort_population(p)
 
     @staticmethod
-    def sort_population(p):
+    def __sort_population(p):
         return sorted(p, key=lambda o: o.fitness)
-
-    def get_best_organism(self):
-        return self.population[0]
-
-    def get_best_fitness(self):
-        return self.population[0].fitness
 
     ###########################
     ###  GA steps and loop  ###
@@ -98,7 +92,7 @@ class GA:
     3. kill off the worst based on their distance from the best
     '''
     @staticmethod
-    def selection(population):
+    def __selection(population):
         size    = len(population)
         max_val = population[0].fitness
         min_val = population[size-1].fitness
@@ -124,9 +118,9 @@ class GA:
                 del population[i]
         return population # TODO test that this is still sorted
 
-    def new_organism(self, parent1, parent2):
-        pos1 = getattr(parent1, 'pos')
-        pos2 = getattr(parent2, 'pos')
+    def __mate_organisms(self, parent1, parent2):
+        pos1 = parent1.pos
+        pos2 = parent2.pos
         n = len(pos1)
         split = random.randint(0, n-1)
         pos1 = pos1[0:split] + pos2[split:]
@@ -140,7 +134,7 @@ class GA:
     # TODO a lot going on here. probably a good idea to test the different cases
     # TODO i want to redo this. I think it will give better performance if breeding is
     # random and the best have the highest chance of getting picked for breeding
-    def crossover(self):
+    def __crossover(self):
         # just do random partners for simplicity
         to_breed = list(self.population)
         pop_size = len(to_breed)
@@ -154,7 +148,7 @@ class GA:
             p2 = to_breed[random.randint(0,pop_size-1)]
             to_breed.remove(p2)
             pop_size = len(to_breed)
-            child1, child2 = self.new_organism(p1, p2)
+            child1, child2 = self.__mate_organisms(p1, p2)
             new_population.append(child1)
             new_population.append(child2)
 
@@ -164,7 +158,7 @@ class GA:
         if len(to_breed) > 0:
             p1 = to_breed[0]
             p2 = self.population[random.randint(0,pop_size-1)]
-            child1, child2 = self.new_organism(p1, p2)
+            child1, child2 = self.__mate_organisms(p1, p2)
             # choose only one of the childs to be used
             if random.randint(0,1) == 0: new_population.append(child1)
             else: new_population.append(child2)
@@ -173,7 +167,7 @@ class GA:
         while len(new_population) < self.population_size:
             p1 = self.population[random.randint(0,pop_size-1)]
             p2 = self.population[random.randint(0,pop_size-1)]
-            child1, child2 = self.new_organism(p1, p2)
+            child1, child2 = self.__mate_organisms(p1, p2)
             # choose only one of the childs to be used
             if random.randint(0,1) == 0: new_population.append(child1)
             else: new_population.append(child2)
@@ -186,7 +180,7 @@ class GA:
 
         self.population = new_population # TODO does this need to be a new list? possible bug
 
-    def mutation(self):
+    def __mutation(self):
         for organism in self.population:
             if random.random() < settings['mutation_rate']:
                 new_pos = []
@@ -207,41 +201,53 @@ class GA:
                     print("Mutation: Moved organism %d to " % organism.id)
                     print(new_pos)
 
+    def __display_state(self):
+        print("implement display_state")
+
+    def __plot_state(self):
+        pts = [(organism.pos[0], organism.pos[1]) for organism in self.population]
+        self.plotutils.plot(pts)
+
+    ####################################
+    # These are the only methods that  #
+    # should be called outside of this #
+    # class                            #
+    ####################################
+    def get_best_organism(self):
+        return self.population[0]
+
+    def get_best_fitness(self):
+        return self.population[0].fitness
+
     def next_generation(self):
         # check we haven't hit a bug in the code
         if self.population_size != len(self.population):
             raise ValueError("We somehow lost track of the population. size=%d, actual=%d" \
                 % (self.population_size, len(self.population)))
 
-        self.population = GA.selection(self.population)
-        self.crossover()
-        self.mutation()
+        self.population = GA.__selection(self.population)
+        self.__crossover()
+        self.__mutation()
         self.num_generations += 1
 
         print("The best f is %f by organism %d" % (self.get_best_fitness(), \
                                                    self.get_best_organism().id))
 
         if settings['step_through'] is True:
-            self.display_state()
+            self.__display_state()
             input("Paused. Hit Enter to continue")
 
         if settings['plot'] is True:
-            self.plot_state()
+            self.__plot_state()
             #input("Paused. Hit Enter to continue")
 
-    def display_state(self):
-        print("implement display_state")
-
-    def plot_state(self):
-        pts = [(organism.pos[0], organism.pos[1]) for organism in self.population]
-        self.plotutils.plot(pts)
 
 if __name__ == "__main__":
     ga = GA()
     print("The best f is %f" % ga.get_best_fitness())
     while settings['num_generations'] > ga.num_generations:
         ga.next_generation()
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     print("The best f is %f" % ga.get_best_fitness())
     print(ga.get_best_organism().id)
