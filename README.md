@@ -7,14 +7,13 @@
 * python <file> - run the python file
 
 
-#### Genetic Algorithm
+### Genetic Algorithm
 To run, change directories with `cd genetic_algorithm` then run the program with `python genetic_algorithm.py`
-* ga_objective_function.py
-    - contains the function being minimized for the algorithm
-* ga_settings.py
-    - includes settings that will be used when running the algorithm
-* genetic_algorithm.py
-    - algorithm to run: "python genetic_algorithm.py"
+| File | Explanation |
+| ---- | ----------- |
+| ga_objective_function.py | contains the function being minimized for the algorithm |
+| ga_settings.py | includes settings that will be used when running the algorithm |
+| genetic_algorithm.py | algorithm to run: `python genetic_algorithm.py` |
 
 | Setting | What it does |
 | ------- | ------------ |
