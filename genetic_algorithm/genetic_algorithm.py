@@ -294,7 +294,6 @@ if __name__ == "__main__":
         ga.do_loop()
         time.sleep(0.01)
 
-    print("The best f is %f" % ga.get_best_f())
-    print(ga.get_best_x().id)
+    print("The best f is %f by organism %d at X =" % (ga.get_best_f(), ga.get_best_x().id))
     print(ga.get_best_x().pos)
     sys.exit()
