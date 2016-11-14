@@ -11,18 +11,17 @@ from ga_objective_function import objective_function
 
 class Organism:
     id = 0
-    num_dims = 0
     pos = []
     f = 0
     func = None
 
-    def __init__(self, id, num_dims, pos, func=objective_function):
+    def __init__(self, id, pos, func=objective_function):
         self.id = id
-        self.num_dims = num_dims
         self.pos = pos
         self.func = func
         self.f = self.fitness()
 
+    # TODO to make this a class function with a pos parameter??
     def fitness(self):
         return self.func(self.pos)
 
@@ -32,7 +31,6 @@ class GA:
     total_organisms = 0
     population = []
     bounds = []
-    fig = None
     best_f = float("inf")
     best_organism = None
     num_generations = 0
@@ -61,7 +59,7 @@ class GA:
     def init_population(self):
         for i in range(0, self.population_size):
             pos = self.get_rand_pos()
-            self.population.append(Organism(i+1, self.num_dims, pos, objective_function))
+            self.population.append(Organism(i+1, pos, objective_function))
             self.total_organisms += 1
 
     def get_rand_pos(self):
@@ -112,7 +110,7 @@ class GA:
         id2 = self.total_organisms + 2
         self.total_organisms += 2
 
-        return (Organism(id1, self.num_dims, pos1), Organism(id2, self.num_dims, pos2))
+        return (Organism(id1, pos1), Organism(id2, pos2))
 
     # TODO a lot going on here. probably a good idea to test the different cases
     # TODO i want to redo this. I think it will give better performance if breeding is
