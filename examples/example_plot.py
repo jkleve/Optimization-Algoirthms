@@ -1,7 +1,7 @@
 import sys # need sys for the next line
 sys.path.append("../utils") # add the utils dir to the python path
 # then we can import PlotUtils
-from ..utils.plot_utils import PlotUtils
+from plot_utils import PlotUtils
 
 # you could import settings from a separate file like so
 from settings import settings
