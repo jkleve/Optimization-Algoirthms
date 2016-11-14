@@ -24,10 +24,10 @@ class Organism:
         self.id = id
         self.pos = pos
         self.func = func
-        self.f = self.fitness()
+        self.fitness = self.get_fitness()
 
     # TODO to make this a class function with a pos parameter??
-    def fitness(self):
+    def get_fitness(self):
         return self.func(self.pos)
 
 class GA:
@@ -41,61 +41,75 @@ class GA:
     """
 
     def __init__(self):
-        self.num_dims        = settings['number_of_dimensions']
-        self.population_size = settings['population_size']
-        self.bounds          = settings['bounds']
+        # read in settings
+        num_dims        = settings['number_of_dimensions']
+        population_size = settings['population_size']
+        bounds          = settings['bounds']
 
         # check to make sure num_dims and number of bounds provided match
-        if len(self.bounds) != self.num_dims:
+        if len(bounds) != num_dims:
             raise ValueError("Number of dimensions doesn't match number of bounds provided")
 
-        # create empty array for storing population
-        self.population = []
-        self.total_organisms = 0
-
-        self.init_population()
+        # set instance variables
+        self.num_dims        = num_dims
+        self.population_size = population_size
+        self.bounds          = bounds
+        self.population      = GA.gen_population(bounds, population_size)
+        self.total_organisms = len(self.population)
         self.num_generations = 1
-        self.best_f = min([organism.f for organism in self.population])
-        self.best_organism = self.get_best_organism()
 
-        if settings['plot'] is True:
-            if self.num_dims > 2:
+        if settings['plot']:
+            try:
+                self.plotutils = PlotUtils(num_dims, bounds)
+            except ValueError:
                 print("Can not plot more than 2 dimensions")
                 settings['plot'] = False
-            else:
-                self.plotutils = PlotUtils(self.num_dims, self.bounds)
 
-    def init_population(self):
-        for i in range(0, self.population_size):
-            pos = oa_utils.gen_random_numbers(self.bounds)
-            self.population.append(Organism(i+1, pos, objective_function))
-            self.total_organisms += 1
-        self.population = self.sort_population(self.population)
+    @staticmethod
+    def gen_organism(id, bounds):
+        # use gen_random_numbers to get a list of positions within the bounds
+        return Organism(id, oa_utils.gen_random_numbers(bounds))
 
-    def sort_population(self, p):
-        return sorted(p, key=lambda o: o.f)
+    @staticmethod
+    def gen_population(bounds, size):
+        b = bounds
+        # generate a list of organisms
+        p = [GA.gen_organism(i+1, b) for i in range(0, size)]
+        return GA.sort_population(p)
+
+    @staticmethod
+    def sort_population(p):
+        return sorted(p, key=lambda o: o.fitness)
 
     def get_best_organism(self):
-        best = None
-        for organism in self.population:
-            if best == None or best.f < organism.f:
-                best = organism
-        return best
+        return self.population[0]
+
+    def get_best_fitness(self):
+        return self.population[0].fitness
 
     ###########################
     ###  GA steps and loop  ###
     ###########################
-    def selection(self):
-        population_values = [getattr(organism, 'f') for organism in self.population]
-        max_val = max(population_values)
-        min_val = min(population_values)
 
+    '''
+    Three possible ways of doing this.
+    1. have a setting that says we kill of last 20% of array or population
+    2. the further you are down the array the higher your probability of dieing
+    3. kill off the worst based on their distance from the best
+    '''
+    @staticmethod
+    def selection(population):
+        size    = len(population)
+        max_val = population[0].fitness
+        min_val = population[size-1].fitness
+
+        # denominator in probability of surviving
         den = (max_val - min_val)
         if den == 0:
             print("Every organism has same objective function value.")
 
-        for organism in self.population:
-            v = getattr(organism, 'f')
+        for (i, organism) in enumerate(population):
+            v = organism.fitness
 
             # check for division by zero
             if den == 0: prob = 0
@@ -103,10 +117,12 @@ class GA:
 
             if prob*settings['selection_multiplier'] > settings['selection_cutoff']:
                 if settings['debug']:
-                    id = getattr(organism, 'id')
-                    f = getattr(organism, 'f')
-                    print("Selection: Removing organism %d with val %f" % (id,f))
-                self.population.remove(organism) # TODO this may be too slow but easy to read
+                    id = organism.id
+                    f = organism.fitness
+                    print("Selection: Deleting organism %d with val %f" % (id,f))
+                # delete the organism from the population
+                del population[i]
+        return population # TODO test that this is still sorted
 
     def new_organism(self, parent1, parent2):
         pos1 = getattr(parent1, 'pos')
@@ -164,8 +180,8 @@ class GA:
 
         if settings['debug']:
             for organism in new_population:
-                id = getattr(organism, 'id')
-                f = getattr(organism, 'f')
+                id = organism.id
+                f  = organism.fitness
                 print("Crossover: New oganism %d with val %f" % (id,f))
 
         self.population = new_population # TODO does this need to be a new list? possible bug
@@ -197,14 +213,13 @@ class GA:
             raise ValueError("We somehow lost track of the population. size=%d, actual=%d" \
                 % (self.population_size, len(self.population)))
 
-        self.selection()
+        self.population = GA.selection(self.population)
         self.crossover()
         self.mutation()
         self.num_generations += 1
-        self.best_organism = self.get_best_organism()
-        self.best_f = self.best_organism.f
 
-        print("The best f is %f by organism %d" % (self.best_f, self.best_organism.id))
+        print("The best f is %f by organism %d" % (self.get_best_fitness(), \
+                                                   self.get_best_organism().id))
 
         if settings['step_through'] is True:
             self.display_state()
@@ -223,12 +238,12 @@ class GA:
 
 if __name__ == "__main__":
     ga = GA()
-    print("The best f is %f" % ga.best_f)
+    print("The best f is %f" % ga.get_best_fitness())
     while settings['num_generations'] > ga.num_generations:
         ga.next_generation()
         time.sleep(0.1)
 
-    print("The best f is %f" % ga.best_f)
-    print(ga.best_organism.id)
-    print(ga.best_organism.pos)
+    print("The best f is %f" % ga.get_best_fitness())
+    print(ga.get_best_organism().id)
+    print(ga.get_best_organism().pos)
     sys.exit()
