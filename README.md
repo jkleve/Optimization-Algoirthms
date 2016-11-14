@@ -9,6 +9,7 @@
 
 ### Genetic Algorithm
 To run, change directories with `cd genetic_algorithm` then run the program with `python genetic_algorithm.py`
+
 | File | Explanation |
 | ---- | ----------- |
 | ga_objective_function.py | contains the function being minimized for the algorithm |
