@@ -225,16 +225,24 @@ class GA:
             raise ValueError("We somehow lost track of the population. size=%d, actual=%d" \
                 % (self.population_size, len(self.population)))
 
-        self.population = GA.__selection(self.population)
+        population = self.population
+
+        population = GA.__selection(population)
+
+        # TODO change crossover and mutation to accept population and
+        # return an array
+        self.population = population
         self.__crossover()
         self.__mutation()
+
+        #self.population = population
         self.num_generations += 1
 
         print("The best f is %f by organism %d" % (self.get_best_fitness(), \
                                                    self.get_best_organism().id))
 
         if settings['step_through']:
-            self.__display_state()
+            #self.__display_state()
             oa_utils.pause()
 
         if settings['plot']:
