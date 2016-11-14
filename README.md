@@ -25,6 +25,7 @@ To run, change directories with `cd genetic_algorithm` then run the program with
 | mutation_rate | How often to cause a mutation of a child |
 | max_mutation_amount | The largest percentage of a dimension allowed to mutate. 1.0 would mean a mutation could jump the child from one side of the bounded space to the other side. |
 | num_generations | # of generations to create before exiting |
+| time_delay | Time delay between each iteration |
 | step_through | Not implemented |
 | plot | True or False on whether we should plot each iteration/generation. Can only plot when number_of_dimensions is set to 2 |
 | debug | True or False on whether we should print out each iteration |

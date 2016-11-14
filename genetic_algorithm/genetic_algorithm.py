@@ -292,7 +292,7 @@ if __name__ == "__main__":
     print("The best f is %f" % ga.get_best_f())
     while settings['num_generations'] > ga.num_generations:
         ga.do_loop()
-        time.sleep(0.01)
+        time.sleep(settings['time_delay'])
 
     print("The best f is %f by organism %d at X =" % (ga.get_best_f(), ga.get_best_x().id))
     print(ga.get_best_x().pos)
