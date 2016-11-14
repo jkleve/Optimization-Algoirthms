@@ -10,6 +10,14 @@ from ga_settings import settings
 from ga_objective_function import objective_function
 
 class Organism:
+    """One organsim to be used with genetic algorithm. Keeps
+    track of the following attributes:
+
+    Attributes:
+        id: A number that specifies an id
+        pos: An array of floats defining the organisms position is space.
+        func: A function to call to calculate this organisms fitness
+    """
 
     def __init__(self, id, pos, func=objective_function):
         self.id = id
@@ -22,14 +30,14 @@ class Organism:
         return self.func(self.pos)
 
 class GA:
-    num_dims = 0
-    population_size = 0
-    total_organisms = 0
-    population = []
-    bounds = []
-    best_f = float("inf")
-    best_organism = None
-    num_generations = 0
+    """A genetic algorithm class that contains methods for handling
+    the population over generations/iterations
+
+    Attributes:
+        There are not attributes for this class. All settings/attributes
+        are read in from ga_settings.py which should be located in the same
+        directory as this file
+    """
 
     def __init__(self):
         self.num_dims        = settings['number_of_dimensions']
