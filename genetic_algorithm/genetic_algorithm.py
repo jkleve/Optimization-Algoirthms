@@ -1,9 +1,11 @@
-import matplotlib.pyplot as plt # plotting
 import random # randint
-import sys # to exit
 import time # delay
 from math import log
 
+import sys # to exit and append to path
+sys.path.append('../utils')
+
+from plot_utils import PlotUtils
 from ga_settings import settings
 from ga_objective_function import objective_function
 
@@ -54,16 +56,7 @@ class GA:
                 print("Can not plot more than 2 dimensions")
                 settings['plot'] = False
             else:
-                self.fig, self.ax = plt.subplots()
-                self.line, = self.ax.plot([], [], 'ro')
-                self.ax.grid()
-                xlim_l = settings['bounds'][0][0]
-                xlim_u = settings['bounds'][0][1]
-                ylim_l = settings['bounds'][1][0]
-                ylim_u = settings['bounds'][1][1]
-                self.ax.set_xlim(xlim_l, xlim_u)
-                self.ax.set_ylim(ylim_l, ylim_u)
-                #plt.show()
+                self.plotutils = PlotUtils(self.num_dims, self.bounds)
 
     def init_population(self):
         for i in range(0, self.population_size):
@@ -218,15 +211,10 @@ class GA:
         print("implement display_state")
 
     def plot_state(self):
-        x = [getattr(organism, 'pos')[0] for organism in self.population]
-        y = [getattr(organism, 'pos')[1] for organism in self.population]
-        self.line.set_xdata(x)
-        self.line.set_ydata(y)
-        self.fig.canvas.draw()
-        self.fig.canvas.flush_events()
+        pts = [(organism.pos[0], organism.pos[1]) for organism in self.population]
+        self.plotutils.plot(pts)
 
 if __name__ == "__main__":
-    plt.ion()
     ga = GA()
     print("The best f is %f" % ga.best_f)
     while settings['num_generations'] > ga.num_generations:
