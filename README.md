@@ -29,3 +29,11 @@ To run, change directories with `cd genetic_algorithm` then run the program with
 | step_through | Not implemented |
 | plot | True or False on whether we should plot each iteration/generation. Can only plot when number_of_dimensions is set to 2 |
 | debug | True or False on whether we should print out each iteration |
+
+### Particle Swarm
+
+### Ant Colony
+
+
+### Utils
+* To plot data in 2 dimensions, use the PlotUtils class in utils/plot_utils.py. You can find an example of how to use it in examples/example_plot.py
