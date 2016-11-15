@@ -1,16 +1,14 @@
-import argparse
-import importlib
+import argparse # parsing command line arguments
+import importlib # dynamically importing modules
 import random # randint
-import time # delay
-from math import log
+import time # delay & timing
+from math import log # used in mutation
 
 import sys # to exit and append to path
 sys.path.append('../utils')
 
 import oa_utils # optimization algorithm utils
-from plot_utils import PlotUtils
-#from ga_settings import settings
-#from ga_objective_function import objective_function
+from plot_utils import PlotUtils # plotting each iteration if plot is True
 
 class Organism:
     """One organsim to be used with genetic algorithm. Keeps
@@ -49,7 +47,7 @@ class GA:
         are read in from ga_settings.py which should be located in the same
         directory as this file
 
-    NOTE: The GA methods assume the population is always sorted
+    NOTE: The GA methods assume the population array is sorted
     """
 
     def __init__(self, settings, function): # TODO add settings parameter
@@ -335,19 +333,30 @@ if __name__ == "__main__":
         settings_module = importlib.import_module('ga_settings')
     settings = settings_module.settings
 
+    # time initialization
+    if settings['time']:
+        start_time = time.time()
+
     # create algorithm instance
     ga = GA(settings, function)
 
-    # print initial best f
-    print("The best f is %f" % ga.get_best_f())
+    if settings['time']:
+        print(" --- Initialized in %s seconds --- " % (time.time() - start_time))
+        if settings['time_delay'] > 0.0 or settings['plot'] or settings['debug'] or settings['step_through']:
+            print(" --- WARNING: You are timing with either time_delay, plot, debug, step_through enabled. --- ")
+            oa_utils.pause()
+        start_time = time.time()
 
     # iterate over generations
     while settings['num_generations'] > ga.num_generations:
         ga.do_loop()
         time.sleep(settings['time_delay'])
 
+    if settings['time']:
+        print(" --- Ran for %s seconds --- " % (time.time() - start_time))
+
     # print out some data
-    print("\n")
+    print("")
     print(str(ga))
 
     sys.exit()
