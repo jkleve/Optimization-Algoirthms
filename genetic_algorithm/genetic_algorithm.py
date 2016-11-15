@@ -67,7 +67,7 @@ class GA:
 
         if settings['plot']:
             try:
-                self.plotutils = PlotUtils(num_dims, bounds)
+                self.plotutils = PlotUtils(num_dims, bounds, objective_function)
             except ValueError:
                 print("Can not plot more than 2 dimensions")
                 settings['plot'] = False

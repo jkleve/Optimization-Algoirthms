@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt # plotting
+import matplotlib.mlab as mlab
+import numpy as np
 
 import sys # check which version of python is runnint
 
@@ -7,7 +9,7 @@ PY3 = sys.version_info[0] == 3
 
 class PlotUtils:
 
-    def __init__(self, num_dims, bounds):
+    def __init__(self, num_dims, bounds, func):
 
         # you can only plot up to 2 dimensions
         if num_dims > 2:
@@ -23,6 +25,23 @@ class PlotUtils:
         self.fig, self.ax = plt.subplots()
         self.line, = self.ax.plot([], [], 'ro')
         self.ax.grid()
+
+
+        delta1 = float(bounds[0][1] - bounds[0][0]) / 100
+        delta2 = float(bounds[1][1] - bounds[1][0]) / 100
+        x1 = np.arange(bounds[0][0], bounds[0][1], delta1)
+        x2 = np.arange(bounds[1][0], bounds[1][1], delta2)
+        X, Y = np.meshgrid(x1, x2)
+        Z = func([X, Y])
+
+        # Create a simple contour plot with labels using default colors.  The
+        # inline argument to clabel will control whether the labels are draw
+        # over the line segments of the contour, removing the lines beneath
+        # the label
+        #plt.figure()
+        CS = plt.contour(X, Y, Z)
+        plt.clabel(CS, inline=1, fontsize=10)
+        plt.title('Simplest default with labels')
 
         xlim_l = bounds[0][0]
         xlim_u = bounds[0][1]
