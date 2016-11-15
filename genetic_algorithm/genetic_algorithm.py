@@ -346,12 +346,12 @@ if __name__ == "__main__":
 
     # --- END OF ARG PARSING --- #
 
+    # print a empty line
+    print("")
+
     # time initialization
     if settings['time']:
         start_time = time.time()
-
-    # print a empty line
-    print("")
 
     # create algorithm instance
     ga = GA(settings, function)
