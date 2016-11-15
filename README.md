@@ -34,6 +34,9 @@ To run, change directories with `cd genetic_algorithm` then run the program with
 
 ### Ant Colony
 
+### Dijkstra's Algorithm
+
+Under construction...
 
 ### Utils
 * To plot data in 2 dimensions, use the PlotUtils class in utils/plot_utils.py. You can find an example of how to use it in examples/example_plot.py
