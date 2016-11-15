@@ -16,6 +16,9 @@ class PlotUtils:
             print("Can not plot more than 2 dimensions")
             raise ValueError
 
+        if num_dims != 2:
+            raise ValueError("Feel free to implement PlotUtils for 1 dimension")
+
         # needed to update plot on the fly
         plt.ion()
 
