@@ -2,11 +2,6 @@ import matplotlib.pyplot as plt # plotting
 import matplotlib.mlab as mlab
 import numpy as np
 
-import sys # check which version of python is runnint
-
-# check if running with python3 or python2
-PY3 = sys.version_info[0] == 3
-
 class PlotUtils:
 
     def __init__(self, num_dims, bounds, func):
@@ -62,6 +57,9 @@ class PlotUtils:
         self.fig.canvas.flush_events()
 
 if __name__ == "__main__":
+    import sys # check which version of python is runnint
+    # check if running with python3 or python2
+    PY3 = sys.version_info[0] == 3
 
     data = [(0,0),(1,1),(2,2),(-3,-3)]
     pu = PlotUtils(2, [(-10,10),(-10,10)])
