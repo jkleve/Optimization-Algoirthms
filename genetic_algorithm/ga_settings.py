@@ -10,7 +10,7 @@ settings = {
     'max_mutation_amount': 0.4, # how large of a mutation is allowed (between 0 and 1)
     'num_generations': 100,
     'time_delay': 0.01,
-    'step_through': False, # TODO not implemented. whether it should pause after each iteration
+    'step_through': True, # whether it should pause after each iteration
     'plot': True, # whether we should plot each iteration
     'debug': True # whether we should print each iteration
 }

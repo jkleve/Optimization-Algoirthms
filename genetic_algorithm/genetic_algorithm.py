@@ -1,3 +1,5 @@
+import argparse
+import importlib
 import random # randint
 import time # delay
 from math import log
@@ -7,8 +9,8 @@ sys.path.append('../utils')
 
 import oa_utils # optimization algorithm utils
 from plot_utils import PlotUtils
-from ga_settings import settings
-from ga_objective_function import objective_function
+#from ga_settings import settings
+#from ga_objective_function import objective_function
 
 class Organism:
     """One organsim to be used with genetic algorithm. Keeps
@@ -20,11 +22,19 @@ class Organism:
         func: A function to call to calculate this organisms fitness
     """
 
-    def __init__(self, id, pos, func=objective_function):
+    def __init__(self, id, pos, func):
         self.id = id
         self.pos = pos
         self.func = func
         self.fitness = self.get_fitness()
+
+    def __str__(self):
+        x_str = "["
+        for x in self.pos:
+            x_str += "%6.3f " % x
+        x_str += "]"
+        return "(id: %d, fitness: %7.4f, X: %s)" % \
+                (self.id, self.fitness, x_str)
 
     # TODO to make this a class function with a pos parameter??
     def get_fitness(self):
@@ -42,7 +52,7 @@ class GA:
     NOTE: The GA methods assume the population is always sorted
     """
 
-    def __init__(self): # TODO add settings parameter
+    def __init__(self, settings, function): # TODO add settings parameter
         # read in settings
         num_dims        = settings['number_of_dimensions']
         population_size = settings['population_size']
@@ -54,34 +64,38 @@ class GA:
 
         # set instance variables
         self.settings        = settings
-        # TODO move away from these next 3 vars
-        self.num_dims        = num_dims
-        self.population_size = population_size
-        self.bounds          = bounds
-
-        self.population      = GA.__gen_population(bounds, population_size)
+        self.function        = function
+        # initialize population
+        self.population      = GA.__gen_population(bounds, population_size, function)
         self.total_organisms = len(self.population)
+        self.best_x          = self.population[0]
         self.num_generations = 1
-
-        self.best_x = self.population[0]
 
         if settings['plot']:
             try:
-                self.plotutils = PlotUtils(num_dims, bounds, objective_function)
+                self.plotutils = PlotUtils(num_dims, bounds, function)
+                self.__plot_state()
             except ValueError:
                 print("Can not plot more than 2 dimensions")
                 settings['plot'] = False
 
-    @staticmethod
-    def __gen_organism(id, bounds):
-        # use gen_random_numbers to get a list of positions within the bounds
-        return Organism(id, oa_utils.gen_random_numbers(bounds))
+        if settings['debug']:
+            self.__display_state()
+
+        if settings['step_through']:
+            oa_utils.pause()
 
     @staticmethod
-    def __gen_population(bounds, size):
+    def __gen_organism(id, bounds, function):
+        # use gen_random_numbers to get a list of positions within the bounds
+        return Organism(id, oa_utils.gen_random_numbers(bounds), function)
+
+    @staticmethod
+    def __gen_population(bounds, size, function):
         b = bounds
+        f = function
         # generate a list of organisms
-        p = [GA.__gen_organism(i+1, b) for i in range(0, size)]
+        p = [GA.__gen_organism(i+1, b, f) for i in range(0, size)]
         return GA.__sort_population(p)
 
     @staticmethod
@@ -124,10 +138,9 @@ class GA:
                 del population[i]
 
                 if debug:
-                    id = organism.id
-                    print("Selection: Deleting organism %d with val %f" % (id,f))
+                    print("Selection: Deleting organism %s" % str(organism))
 
-        return population # TODO test that this is still sorted
+        return population
 
     @staticmethod
     def __get_parent_index(cdf_value, arr):
@@ -139,7 +152,7 @@ class GA:
         return -1
 
     @staticmethod
-    def __mate_parents(id, parent1, parent2):
+    def __mate_parents(id, parent1, parent2, function):
         n = len(parent1.pos)
         # randomly choose split position
         split = random.randint(0, n-1)
@@ -150,11 +163,8 @@ class GA:
         id1 = id + 1
         id2 = id + 2
         # return the two newly created organisms
-        return (Organism(id1, pos1), Organism(id2, pos2))
+        return (Organism(id1, pos1, function), Organism(id2, pos2, function))
 
-    # TODO a lot going on here. probably a good idea to test the different cases
-    # TODO i want to redo this. I think it will give better performance if breeding is
-    # random and the best have the highest chance of getting picked for breeding
     """
         population: population
         size: size that the population should be after crossover
@@ -162,7 +172,7 @@ class GA:
               array of the new population.
     """
     @staticmethod
-    def __crossover(id, population, size, debug=False):
+    def __crossover(id, population, size, function, debug=False):
         new_population = []
         length = len(population)
         max_f = population[length-1].fitness
@@ -194,16 +204,14 @@ class GA:
             i = GA.__get_parent_index(cdf1, probabilities)
             j = GA.__get_parent_index(cdf2, probabilities)
             # mate parents
-            child1, child2 = GA.__mate_parents(id, population[i], population[j])
+            child1, child2 = GA.__mate_parents(id, population[i], population[j], function)
             id += 2
             # append children to new_population
             new_population.extend((child1, child2))
 
         if debug:
             for organism in new_population:
-                id = organism.id
-                f  = organism.fitness
-                print("Crossover: New oganism %d with val %f" % (id,f))
+                print("Crossover: New oganism %s" % str(organism))
 
         return new_population
 
@@ -228,20 +236,29 @@ class GA:
 
                     new_pos.append(new_dim_pos)
 
-                organism.pos = new_pos
-
                 if debug:
-                    print("Mutation: Moved organism %d to " % organism.id)
-                    print(new_pos)
+                    new_pos_str = "["
+                    for x in new_pos:
+                        new_pos_str += "%6.3f " % x
+                    new_pos_str += "]"
+                    print("Mutation: Moving organism %s to %s" % \
+                          (str(organism), new_pos_str))
+
+                organism.pos = new_pos
 
         return population
 
     def __display_state(self):
-        print("implement display_state")
+        print("The best organism in generation %d is %s" \
+                % (self.num_generations, str(self.get_best_x())))
 
     def __plot_state(self):
         pts = [(organism.pos[0], organism.pos[1]) for organism in self.population]
         self.plotutils.plot(pts)
+
+    def __str__(self):
+        return "Best Fitness: %8.4f by organism %s" % \
+                (self.get_best_f(), str(self.get_best_x()))
 
     ####################################
     # These are the only methods that  #
@@ -255,20 +272,24 @@ class GA:
         return self.best_x.fitness
 
     def do_loop(self):
-        # check we haven't hit a bug in the code
-        if self.population_size != len(self.population):
-            raise ValueError("We somehow lost track of the population. size=%d, actual=%d" \
-                % (self.population_size, len(self.population)))
-
         population = self.population
 
-        population = GA.__selection(population, self.settings['selection_cutoff'])
+        population = GA.__selection(population,                        \
+                                    self.settings['selection_cutoff'], \
+                                    self.settings['debug'])
 
-        population = GA.__crossover(self.total_organisms, population, self.settings['population_size'])
+        population = GA.__crossover(self.total_organisms, \
+                                    population,           \
+                                    self.settings['population_size'], \
+                                    self.function,        \
+                                    self.settings['debug'])
         self.total_organisms += len(population)
 
-        population = GA.__mutation(population, self.bounds, settings['mutation_rate'], \
-                      settings['max_mutation_amount'])
+        population = GA.__mutation(population, \
+                                   self.settings['bounds'], \
+                                   self.settings['mutation_rate'],       \
+                                   self.settings['max_mutation_amount'], \
+                                   self.settings['debug'])
 
         self.population = GA.__sort_population(population)
         self.num_generations += 1
@@ -276,24 +297,57 @@ class GA:
         if self.population[0].fitness < self.best_x.fitness:
             self.best_x = self.population[0]
 
-        print("The best f is %f by organism %d" % (self.get_best_f(), \
-                                                   self.get_best_x().id))
-
-        if settings['step_through']:
-            #self.__display_state()
-            oa_utils.pause()
-
         if settings['plot']:
             self.__plot_state()
 
+        if settings['debug']:
+            self.__display_state()
 
+        if settings['step_through']:
+            oa_utils.pause()
+
+########################################################################################
+#                                     MAIN                                             #
+########################################################################################
 if __name__ == "__main__":
-    ga = GA()
+    parser = argparse.ArgumentParser(description='Accept an optional settings file')
+    parser.add_argument('--settings', '-s', nargs=1, type=str, \
+                        metavar='<file>', help='specify settings file to use')
+    parser.add_argument('--function', '-f', nargs=1, type=str, \
+                        metavar='<file>', help='specify objective function file to use')
+    parser.add_argument('-v', action='store_true', help='print debug statements')
+    args = parser.parse_args()
+
+    function_module = None
+    settings_module = None
+
+    # get objective function
+    if args.function:
+        function_module = importlib.import_module(args.function[0])
+    else:
+        function_module = importlib.import_module('ga_objective_function')
+    function = function_module.objective_function
+
+    # get settings
+    if args.settings:
+        settings_module = importlib.import_module(args.settings[0])
+    else:
+        settings_module = importlib.import_module('ga_settings')
+    settings = settings_module.settings
+
+    # create algorithm instance
+    ga = GA(settings, function)
+
+    # print initial best f
     print("The best f is %f" % ga.get_best_f())
+
+    # iterate over generations
     while settings['num_generations'] > ga.num_generations:
         ga.do_loop()
         time.sleep(settings['time_delay'])
 
-    print("The best f is %f by organism %d at X =" % (ga.get_best_f(), ga.get_best_x().id))
-    print(ga.get_best_x().pos)
+    # print out some data
+    print("\n")
+    print(str(ga))
+
     sys.exit()
