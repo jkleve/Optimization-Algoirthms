@@ -77,7 +77,7 @@ class GA:
                 print("Can not plot more than 2 dimensions")
                 settings['plot'] = False
 
-        if settings['debug']:
+        if settings['print_iterations']:
             self.__display_state()
 
         if settings['step_through']:
@@ -112,7 +112,7 @@ class GA:
     TODO write a test for this. simple 10 population w/ .5 cutoff test will do
     '''
     @staticmethod
-    def __selection(population, cutoff, debug=False):
+    def __selection(population, cutoff, print_action=False):
         size    = len(population)
         max_f = population[0].fitness
         min_f = population[size-1].fitness
@@ -135,7 +135,7 @@ class GA:
                 # delete the organism from the population
                 del population[i]
 
-                if debug:
+                if print_action:
                     print("Selection: Deleting organism %s" % str(organism))
 
         return population
@@ -170,7 +170,7 @@ class GA:
               array of the new population.
     """
     @staticmethod
-    def __crossover(id, population, size, function, debug=False):
+    def __crossover(id, population, size, function, print_action=False):
         new_population = []
         length = len(population)
         max_f = population[length-1].fitness
@@ -207,14 +207,14 @@ class GA:
             # append children to new_population
             new_population.extend((child1, child2))
 
-        if debug:
+        if print_action:
             for organism in new_population:
                 print("Crossover: New oganism %s" % str(organism))
 
         return new_population
 
     @staticmethod
-    def __mutation(population, bounds, rate, max_mutation_amount, debug=False):
+    def __mutation(population, bounds, rate, max_mutation_amount, print_action=False):
         for organism in population:
             if random.random() < rate:
                 new_pos = []
@@ -234,7 +234,7 @@ class GA:
 
                     new_pos.append(new_dim_pos)
 
-                if debug:
+                if print_action:
                     new_pos_str = "["
                     for x in new_pos:
                         new_pos_str += "%6.3f " % x
@@ -274,20 +274,20 @@ class GA:
 
         population = GA.__selection(population,                        \
                                     self.settings['selection_cutoff'], \
-                                    self.settings['debug'])
+                                    self.settings['print_actions'])
 
         population = GA.__crossover(self.total_organisms, \
                                     population,           \
                                     self.settings['population_size'], \
                                     self.function,        \
-                                    self.settings['debug'])
+                                    self.settings['print_actions'])
         self.total_organisms += len(population)
 
         population = GA.__mutation(population, \
                                    self.settings['bounds'], \
                                    self.settings['mutation_rate'],       \
                                    self.settings['max_mutation_amount'], \
-                                   self.settings['debug'])
+                                   self.settings['print_actions'])
 
         self.population = GA.__sort_population(population)
         self.num_generations += 1
@@ -298,7 +298,7 @@ class GA:
         if settings['plot']:
             self.__plot_state()
 
-        if settings['debug']:
+        if settings['print_iterations']:
             self.__display_state()
 
         if settings['step_through']:
@@ -313,7 +313,9 @@ if __name__ == "__main__":
                         metavar='<file>', help='specify settings file to use')
     parser.add_argument('--function', '-f', nargs=1, type=str, \
                         metavar='<file>', help='specify objective function file to use')
-    parser.add_argument('-v', action='store_true', help='print debug statements')
+    parser.add_argument('-v', action='store_true', help='print info when method is doing an action')
+    parser.add_argument('--time', '-t', action='store_true', help='turn timing on for the algorithm')
+    parser.add_argument('--plot', '-p', action='store_true', help='plot each iteration')
     args = parser.parse_args()
 
     function_module = None
@@ -333,17 +335,33 @@ if __name__ == "__main__":
         settings_module = importlib.import_module('ga_settings')
     settings = settings_module.settings
 
+    # if -v is set change the setting
+    if args.v:
+        settings['print_actions'] = True
+        settings['print_iterations'] = True
+
+    # check for a couple more command line arguments
+    if args.time: settings['time'] = True
+    if args.plot: settings['plot'] = True
+
+    # --- END OF ARG PARSING --- #
+
     # time initialization
     if settings['time']:
         start_time = time.time()
+
+    # print a empty line
+    print("")
 
     # create algorithm instance
     ga = GA(settings, function)
 
     if settings['time']:
         print(" --- Initialized in %s seconds --- " % (time.time() - start_time))
-        if settings['time_delay'] > 0.0 or settings['plot'] or settings['debug'] or settings['step_through']:
-            print(" --- WARNING: You are timing with either time_delay, plot, debug, step_through enabled. --- ")
+        if settings['time_delay'] > 0.0 or settings['plot'] \
+          or settings['print_actions'] or settings['print_iterations'] or settings['step_through']:
+            print("\n --- WARNING: You are timing with either time_delay, plot, print_actions,")
+            print("              print_iterations, or step_through enabled. --- \n")
             oa_utils.pause()
         start_time = time.time()
 

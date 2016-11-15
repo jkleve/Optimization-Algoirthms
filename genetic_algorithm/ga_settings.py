@@ -12,6 +12,7 @@ settings = {
     'time_delay': 0.0,
     'step_through': False, # whether it should pause after each iteration
     'plot': False, # whether we should plot each iteration
-    'debug': False, # whether we should print each iteration
-    'time': True # whether we should output timing information
+    'print_actions': False, # whether we should print when a method does an action
+    'print_iterations': False, # whether we should print after each iteration
+    'time': False # whether we should output timing information
 }

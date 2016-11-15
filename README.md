@@ -28,7 +28,9 @@ To run, change directories with `cd genetic_algorithm` then run the program with
 | time_delay           | Time delay between each iteration |
 | step_through         | True or False on whether we should pause after each iteration |
 | plot                 | True or False on whether we should plot each iteration/generation. Can only plot when number_of_dimensions is set to 2 |
-| debug                | True or False on whether we should print out each iteration |
+| print_actions        | True or False on whether we should print when a method does an action |
+| print_iterations     | True or False on whether we should print after each iteration
+| time                 | True of False on whether we should time the algorithm. Having a time_delay set or step_through, plot, print_actions, or print_iterations True will affect timing |
 
 ### Particle Swarm
 
