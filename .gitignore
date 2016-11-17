@@ -1,2 +1,3 @@
 start-tunnels.sh
 *.pyc
+local_settings.py
