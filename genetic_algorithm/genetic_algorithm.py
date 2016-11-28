@@ -6,8 +6,10 @@ from math import log # used in mutation
 
 import sys # to exit and append to path
 sys.path.append('../utils')
+sys.path.append('../timing')
 
 import oa_utils # optimization algorithm utils
+from timer import Timer
 from plot_utils import PlotUtils # plotting each iteration if plot is True
 
 class Organism:
@@ -38,7 +40,7 @@ class Organism:
     def get_fitness(self):
         return self.func(self.pos)
 
-class GA:
+class GA(Timer, object):
     """A genetic algorithm class that contains methods for handling
     the population over generations/iterations
 
@@ -51,6 +53,8 @@ class GA:
     """
 
     def __init__(self, settings, function): # TODO add settings parameter
+        super(self.__class__, self).__init__()
+
         # read in settings
         num_dims        = settings['number_of_dimensions']
         population_size = settings['population_size']
@@ -295,14 +299,21 @@ class GA:
         if self.population[0].fitness < self.best_x.fitness:
             self.best_x = self.population[0]
 
-        if settings['plot']:
+        if self.settings['plot']:
             self.__plot_state()
 
-        if settings['print_iterations']:
+        if self.settings['print_iterations']:
             self.__display_state()
 
-        if settings['step_through']:
+        if self.settings['step_through']:
             oa_utils.pause()
+
+    def run(self):
+            # iterate over generations
+        while self.settings['num_iterations'] > self.num_generations:
+            self.do_loop()
+            time.sleep(self.settings['time_delay'])
+
 
 ########################################################################################
 #                                     MAIN                                             #
@@ -363,15 +374,15 @@ if __name__ == "__main__":
             print("\n --- WARNING: You are timing with either time_delay, plot, print_actions,")
             print("              print_iterations, or step_through enabled. --- \n")
             oa_utils.pause()
-        start_time = time.time()
+        ga.start_timer()
+        #start_time = time.time()
 
-    # iterate over generations
-    while settings['num_generations'] > ga.num_generations:
-        ga.do_loop()
-        time.sleep(settings['time_delay'])
+    ga.run()
 
     if settings['time']:
-        print(" --- Ran for %s seconds --- " % (time.time() - start_time))
+        ga.stop_timer()
+        print(" --- Ran for %s seconds --- " % (ga.get_time()))
+        #print(" --- Ran for %s seconds --- " % (time.time() - start_time))
 
     # print out some data
     print("")
