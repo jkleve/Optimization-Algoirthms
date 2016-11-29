@@ -126,6 +126,12 @@ class PSO:
             velocity_array.append(k*(w*v + c1*random.random()*(p.pbest[i] - p.pos[i]) + c2*random.random()*(gbest[i] - p.pos[i])))
         return velocity_array
 
+    @staticmethod
+    def __update_position(population):
+        for p in population:
+            p.pos = p.pos + p.velocity
+
+
 
     def __display_state(self):
         print("The best organism in generation %d is %s" \
@@ -148,29 +154,25 @@ class PSO:
         return self.best_x
 
     def get_best_f(self):
-        return self.best_x.fitness
+        return self.best_x.fval
 
     def do_loop(self):
         population = self.population
 
-        population = PSO.__update_velocity(population,                        \
+        population = PSO.__update_velocity(population,              \
                                     self.settings['velocity_type'], \
                                     self.settings['print_actions'], \
-                                    self.get_best_x().pos, \
-                                    self.settings['cp'], \
-                                    self.settings['cg'], \
-                                    self.k, \
+                                    self.get_best_x().pos,          \
+                                    self.settings['cp'],            \
+                                    self.settings['cg'],            \
+                                    self.k,                         \
                                     self.settings['weight'])
 
-        population = PSO.__update_position(self.total_organisms, \
-                                    population,           \
-                                    self.settings['population_size'], \
-                                    self.function,        \
-                                    self.settings['print_actions'])
+        population = PSO.__update_position(population)
 
         self.num_iterations += 1
 
-        if self.population[0].fitness < self.best_x.fitness:
+        if self.population[0].fval < self.best_x.fval:
             self.best_x = self.population[0]
 
         if settings['plot']:
@@ -253,6 +255,6 @@ if __name__ == "__main__":
 
     # print out some data
     print("")
-    print(str(ga))
+    print(str(pso))
 
     sys.exit()
