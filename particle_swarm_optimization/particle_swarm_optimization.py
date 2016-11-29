@@ -117,10 +117,12 @@ class PSO:
             elif (velocity_type == 'constriction'):
                 PSO.__get_velocity(k, cp, cg, gbest, p, 1)
 
+        return population
+
     @staticmethod
     def __get_velocity(k, c1, c2, gbest, p, w):
         velocity_array = []
-        for i, v in enumerate(p.velocity)
+        for i, v in enumerate(p.velocity):
             velocity_array.append(k*(w*v + c1*random.random()*(p.pbest[i] - p.pos[i]) + c2*random.random()*(gbest[i] - p.pos[i])))
         return velocity_array
 

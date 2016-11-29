@@ -10,7 +10,7 @@ settings = {
     'cp': 0.5,
     'cg': 0.75,
     'weight': 0.5,      #this is only used when velocity_type is inertia
-    'velocity_type': 'inertia' # inertia or constriction
+    'velocity_type': 'inertia', # inertia or constriction
     'step_through': False, # whether it should pause after each iteration
     'plot': False, # whether we should plot each iteration
     'print_actions': False, # whether we should print when a method does an action

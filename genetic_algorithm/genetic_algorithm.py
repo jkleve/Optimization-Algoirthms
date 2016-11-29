@@ -12,6 +12,8 @@ import oa_utils # optimization algorithm utils
 from timer import Timer
 from plot_utils import PlotUtils # plotting each iteration if plot is True
 
+"""http://www.swarmintelligence.org/tutorials.php"""
+
 class Organism:
     """One organsim to be used with genetic algorithm. Keeps
     track of the following attributes:
