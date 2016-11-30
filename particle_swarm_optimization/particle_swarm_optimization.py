@@ -2,7 +2,9 @@ import argparse # parsing command line arguments
 import importlib # dynamically importing modules
 import random # randint
 import time # delay & timing
-from math import sqrt # used in mutation
+from math import sqrt
+from operator import add, attrgetter
+import copy
 
 import sys # to exit and append to path
 sys.path.append('../utils')
@@ -35,6 +37,12 @@ class Particle:
         x_str += "]"
         return "(id: %d, fval: %7.4f, X: %s)" % \
                 (self.id, self.fval, x_str)
+
+    def __repr__(self):
+        return "<Particle(%d)>" % self.id
+
+    def __cmp__(self, other):
+        return cmp(self.fval, other.get_fval())
 
     # TODO to make this a class function with a pos parameter??
     def get_fval(self):
@@ -76,7 +84,7 @@ class PSO:
         # initialize population
         self.population      = PSO.__gen_population(bounds, population_size, function)
         self.total_population = population_size
-        self.best_x          = self.population[0] #will have to sort through to find best solution/particle not just position
+        self.best_x          = PSO.__get_best_particle(self.population)
         self.num_iterations = 1
 
         if settings['plot']:
@@ -112,11 +120,12 @@ class PSO:
     @staticmethod
     def __update_velocity(population, velocity_type, print_actions, gbest, cp, cg, k, w):
         for p in population:
-            if (velocity_type == 'inertia'):
-                PSO.__get_velocity(k, cp, cg, gbest, p, w)
+            if (velocity_type == 'normal'):
+                p.velocity = PSO.__get_velocity(1, cp, cg, gbest, p, 1)
+            elif (velocity_type == 'inertia'):
+                p.velocity = PSO.__get_velocity(k, cp, cg, gbest, p, w)
             elif (velocity_type == 'constriction'):
-                PSO.__get_velocity(k, cp, cg, gbest, p, 1)
-
+                p.velocity = PSO.__get_velocity(k, cp, cg, gbest, p, 1)
         return population
 
     @staticmethod
@@ -127,11 +136,15 @@ class PSO:
         return velocity_array
 
     @staticmethod
-    def __update_position(population):
+    def __update_position(population): # TODO put bounds on what position can be updated to
         for p in population:
-            p.pos = p.pos + p.velocity
+            p.pos = map(add, p.pos, p.velocity)
+            p.fval = p.get_fval()
+        return population
 
-
+    @staticmethod
+    def __get_best_particle(population):
+        return copy.deepcopy( min(population, key=attrgetter('fval')) )
 
     def __display_state(self):
         print("The best organism in generation %d is %s" \
@@ -142,7 +155,7 @@ class PSO:
         self.plotutils.plot(pts)
 
     def __str__(self):
-        return "Best Fitness: %8.4f by organism %s" % \
+        return "Best Fitness: %8.4f by particle %s" % \
                 (self.get_best_f(), str(self.get_best_x()))
 
     ####################################
@@ -172,8 +185,12 @@ class PSO:
 
         self.num_iterations += 1
 
-        if self.population[0].fval < self.best_x.fval:
-            self.best_x = self.population[0]
+        self.population = population
+
+        current_best = PSO.__get_best_particle(self.population)
+
+        if current_best.get_fval() < self.best_x.get_fval():
+            self.best_x = current_best
 
         if settings['plot']:
             self.__plot_state()

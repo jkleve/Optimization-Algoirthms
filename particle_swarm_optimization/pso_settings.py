@@ -7,12 +7,12 @@ settings = {
     ],
     'num_iterations': 100,
     'time_delay': 0.0,
-    'cp': 0.5,
-    'cg': 0.75,
+    'cp': 0.8,
+    'cg': 0.2,
     'weight': 0.5,      #this is only used when velocity_type is inertia
     'velocity_type': 'inertia', # inertia or constriction
-    'step_through': False, # whether it should pause after each iteration
-    'plot': False, # whether we should plot each iteration
+    'step_through': True, # whether it should pause after each iteration
+    'plot': True, # whether we should plot each iteration
     'print_actions': False, # whether we should print when a method does an action
     'print_iterations': False, # whether we should print after each iteration
     'time': False # whether we should output timing information
