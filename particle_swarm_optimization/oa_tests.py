@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from particle_swarm_optimization import PSO as OptimizationAlgorithm
 import pso_settings
 import pso_objective_function
+import ackley_function
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -10,7 +11,9 @@ def num_parts_vs_time(o_algorithm, num_parts):
     for test in num_parts:
         pso_settings.settings['population_size'] = test
 
-        algorithm = o_algorithm(ga_settings.settings, ga_objective_function.objective_function)
+###SWITCH THESE WHEN CHANGING BETWEEN OBJECTIVE FUNCTION AND ACKLEY FUNCTION###
+        # algorithm = o_algorithm(pso_settings.settings, pso_objective_function.objective_function)
+        algorithm = o_algorithm(pso_settings.settings, ackley_function.objective_function)
 
         algorithm.start_timer()
         algorithm.run()
@@ -32,7 +35,9 @@ def func_val_vs_iterations(o_algorithm, num_parts):
 
         pso_settings.settings['population_size'] = test
 
-        algorithm = o_algorithm(pso_settings.settings, pso_objective_function.objective_function)
+###SWITCH THESE WHEN CHANGING BETWEEN OBJECTIVE FUNCTION AND ACKLEY FUNCTION###
+        # algorithm = o_algorithm(pso_settings.settings, pso_objective_function.objective_function)
+        algorithm = o_algorithm(pso_settings.settings, ackley_function.objective_function)
 
         while pso_settings.settings['num_iterations'] > algorithm.num_iterations:
             f.append(algorithm.get_best_f())

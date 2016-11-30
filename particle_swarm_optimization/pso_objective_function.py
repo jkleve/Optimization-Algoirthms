@@ -1,4 +1,3 @@
-#from math import sqrt, cos
 from numpy import sqrt, cos
 
 def objective_function(params):
