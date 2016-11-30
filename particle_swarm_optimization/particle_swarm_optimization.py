@@ -8,12 +8,16 @@ import copy
 
 import sys # to exit and append to path
 sys.path.append('../utils')
+sys.path.append('../timing')
 
 import oa_utils # optimization algorithm utils
+from timer import Timer
 from plot_utils import PlotUtils # plotting each iteration if plot is True
 
+"""http://www.swarmintelligence.org/tutorials.php"""
+
 class Particle:
-    """One organsim to be used with genetic algorithm. Keeps
+    """One particle to be used with particle swarm optimization. Keeps
     track of the following attributes:
 
     Attributes:
@@ -52,22 +56,22 @@ class Particle:
         return self.velocity
 
 class PSO:
-    """A genetic algorithm class that contains methods for handling
-    the population over generations/iterations
+    """A particle swarm class that contains methods for handling
+    the population over iterations
 
     Attributes:
         There are not attributes for this class. All settings/attributes
-        are read in from ga_settings.py which should be located in the same
+        are read in from pso_settings.py which should be located in the same
         directory as this file
-
-    NOTE: The GA methods assume the population array is sorted
     """
 
     def __init__(self, settings, function): # TODO add settings parameter
         # read in settings
+
         num_dims        = settings['number_of_dimensions']
         population_size = settings['population_size']
         bounds          = settings['bounds']
+
         if settings['velocity_type'] == 'constriction':
             phi = max(settings['cp'] + settings['cg'], 4.0)
             self.k = 2.0/abs(2.0 - phi - sqrt(phi*phi - 4.0*phi))
@@ -192,14 +196,20 @@ class PSO:
         if current_best.get_fval() < self.best_x.get_fval():
             self.best_x = current_best
 
-        if settings['plot']:
+        if self.settings['plot']:
             self.__plot_state()
 
-        if settings['print_iterations']:
+        if self.settings['print_iterations']:
             self.__display_state()
 
-        if settings['step_through']:
+        if self.settings['step_through']:
             oa_utils.pause()
+
+    def run(self):
+            # iterate over generations
+        while settings['num_iterations'] > pso.num_iterations:
+            pso.do_loop()
+            time.sleep(settings['time_delay'])
 
 ########################################################################################
 #                                     MAIN                                             #
@@ -260,15 +270,14 @@ if __name__ == "__main__":
             print("\n --- WARNING: You are timing with either time_delay, plot, print_actions,")
             print("              print_iterations, or step_through enabled. --- \n")
             oa_utils.pause()
-        start_time = time.time()
+        pso.start_timer()
 
     # iterate over generations
-    while settings['num_iterations'] > pso.num_iterations:
-        pso.do_loop()
-        time.sleep(settings['time_delay'])
+    pso.run()
 
     if settings['time']:
-        print(" --- Ran for %s seconds --- " % (time.time() - start_time))
+        pso.stop_timer()
+        print(" --- Ran for %s seconds --- " % (pso.get_time()))
 
     # print out some data
     print("")
