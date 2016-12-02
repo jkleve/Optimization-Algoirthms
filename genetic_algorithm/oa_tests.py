@@ -7,6 +7,8 @@ import sys
 sys.path.append('../functions')
 sys.path.append('../utils')
 
+import regression_utils
+
 from genetic_algorithm import GA as OptimizationAlgorithm
 from ga_settings import settings
 from ackley_function import objective_function
@@ -49,35 +51,31 @@ def func_val_vs_iterations(o_algorithm, num_parts):
 
     plt.title('Number of particles vs iterations')
     plt.xlabel('Number of Iterations')
-    plt.ylabel('Number of Particles')
+    plt.ylabel('Objective Function Value')
     plt.legend(num_parts)
-    fig_name = 'particles_vs_iterations'
+    fig_name = 'func_value_vs_iterations'
     fig.savefig(fig_name + '.png')
     plt.close(fig)
 
-if __name__ == "__main__":
-
-    #num_particles = [50, 100, 500]# + range(1000, 10000, 1000)
-    #tests = num_parts_vs_time(OptimizationAlgorithm, num_particles)
-
-    #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
-
+# x1_name: name of setting in settings file
+# x2_name: name of setting in settings file
+def two_d_response_surface(x1_start, x1_step, x1_end, \
+                           x2_start, x2_step, x2_end, \
+                           x1_name, x2_name, \
+                           population_size=50, num_tests_per_point=10, save_histograms=True):
     tests = {}
     hist_num_bins = 150
 
-    # selection cutoff [0.1, 0.9]
-    # mutation rate    [0.05, 0.8]
-    # number of runs 50 w/ 50 particles
-    settings['population_size'] = 50
-    num_tests_per = 50
-    sc_start = 0.3
-    sc_end   = 0.6
-    sc_step  = 0.05
-    mt_start = 0.2
-    mt_end   = 0.4
-    mt_step  = 0.1
-    num_tests = int(( (int(100*sc_end)-int(100*sc_start))/int(100*sc_step) + 1 )* \
-                ( (int(100*mt_end)-int(100*mt_start))/int(100*mt_step) + 1 ))
+    settings['population_size'] = population_size
+    num_tests_per = num_tests_per_point
+    x1_srt = x1_start
+    x1_e   = x1_end
+    x1_stp = x1_step
+    x2_srt = x2_start
+    x2_e   = x2_end
+    x2_stp = x2_step
+    num_tests = int(( (int(100*x1_e)-int(100*x1_srt))/int(100*x1_stp) + 1 )* \
+                    ( (int(100*x2_e)-int(100*x2_srt))/int(100*x2_stp) + 1 ))
     X = np.ones(shape=(num_tests,6))
     y = np.zeros(shape=(num_tests,1))
 
@@ -89,28 +87,37 @@ if __name__ == "__main__":
 
     #ax2 = fig.add_subplot(212, projection='3d')
 
-    for i in np.arange(sc_start, sc_end+sc_step, sc_step):
-        for j in np.arange(mt_start, mt_end+mt_step, mt_step):
-            settings['selection_cutoff'] = i
-            settings['mutation_rate'] = j
+    for i in np.arange(x1_srt, x1_e+x1_stp, x1_stp):
+        for j in np.arange(x2_srt, x2_e+x2_stp, x2_stp):
+            # set settings for this test
+            settings[x1_name] = i
+            settings[x2_name] = j
 
+            # initial variables
             values = []
-            test_name = str(i) + ',' + str(j)
+            test_name = x1_name + '(' + str(i) + ')'+ ',' + x2_name + '(' + str(j) + ')'
+
             print("Running test %s" % test_name)
 
-            hist_fig = plt.figure()
-            hist_ax = hist_fig.add_subplot(111)
+            # create histogram plot if true
+            if save_histograms:
+                hist_fig = plt.figure()
+                hist_ax = hist_fig.add_subplot(111)
 
+            # run optimization algorithm
             for k in range(0,num_tests_per):
                 algorithm = OptimizationAlgorithm(settings, objective_function)
                 algorithm.run()
-
+                # save enf values
                 values.append(algorithm.get_best_x().get_fitness())
 
-            hist_ax.hist(values, hist_num_bins, range=(0, 1.5))
-            hist_fig.savefig(test_name + '.png')
-            plt.close(hist_fig)
+            # save histogram if true
+            if save_histograms:
+                hist_ax.hist(values, hist_num_bins, range=(0, 1.5))
+                hist_fig.savefig(test_name + '.png')
+                plt.close(hist_fig)
 
+            # find average and save data
             #avg = sum(values)/len(values)
             avg = median(values)
             tests[test_name] = avg
@@ -122,13 +129,12 @@ if __name__ == "__main__":
             X[n][4] = i*j
             X[n][5] = j*j
             y[n] = avg
+
+            # increment test number
             n += 1
 
-    XtX = np.matmul(X.transpose(), X)
-    XtXinv = np.linalg.inv(XtX)
-    XtXinvXt = np.matmul(XtXinv, X.transpose())
-
-    b = np.matmul(XtXinvXt, y)
+    # get regression coefficients
+    b = regression_utils.get_regression_coef(X, y)
 
     print("\n*** DATA ***")
     print("X")
@@ -141,8 +147,8 @@ if __name__ == "__main__":
     print(tests)
     print("\nPlotting ...")
 
-    pltx = np.arange(sc_start, sc_end+sc_step, sc_step)
-    plty = np.arange(mt_start, mt_end+mt_step, mt_step)
+    pltx = np.arange(x1_start, x1_end+x1_step, x1_step)
+    plty = np.arange(x2_start, x2_end+x2_step, x2_step)
     pltX, pltY = np.meshgrid(pltx, plty)
     F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
     ax1.plot_wireframe(pltX, pltY, F)
@@ -151,3 +157,23 @@ if __name__ == "__main__":
     ax1.set_ylabel('Mutation Rate')
     ax1.set_zlabel('Median Objective Function Value')
     plt.show()
+
+
+if __name__ == "__main__":
+
+    #num_particles = [50, 100, 500]# + range(1000, 10000, 1000)
+    #tests = num_parts_vs_time(OptimizationAlgorithm, num_particles)
+
+    #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
+    x1_start = 0.3
+    x1_step = 0.1
+    x1_end = 0.6
+    x2_start = 0.2
+    x2_step = 0.1
+    x2_end = 0.4
+    x1_name = "selection_cutoff"
+    x2_name = "mutation_rate"
+
+    two_d_response_surface(x1_start, x1_step, x1_end, \
+                           x2_start, x2_step, x2_end, \
+                           x1_name, x2_name)
