@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
-import threading
-from threading import Thread
+#import threading
+#from threading import Thread
+from multiprocessing import Process
 from statistics import median
 import sys
 sys.path.append('../genetic_algorithm')
@@ -192,7 +193,10 @@ def ga_data_points(o_algorithm, settings, o_function):
     return get_two_d_accuracy(o_algorithm, settings, o_function, \
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
-                              x1_name, x2_name)
+                              x1_name, x2_name, \
+                              population_size=50, num_tests_per_point=50, plot=False, \
+                              save_histograms=False, response_surface=False \
+                             )
 
 def pso_data_points(o_algorithm, settings, o_function):
     x1_start = 0.0
@@ -207,7 +211,10 @@ def pso_data_points(o_algorithm, settings, o_function):
     return get_two_d_accuracy(o_algorithm, settings, o_function, \
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
-                              x1_name, x2_name)
+                              x1_name, x2_name, \
+                              population_size=50, num_tests_per_point=50, plot=False, \
+                              save_histograms=False, response_surface=False \
+                             )
 
 if __name__ == "__main__":
 
@@ -220,10 +227,10 @@ if __name__ == "__main__":
     #ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
     #sys.exit()
 
-    Thread( target = ga_data_points, \
+    Process( target = ga_data_points, \
             args = (GA, ga_settings.settings, ackley_function.objective_function) \
           ).start()
 
-    Thread( target = pso_data_points, \
+    Process( target = pso_data_points, \
             args = (PSO, pso_settings.settings, ackley_function.objective_function) \
           ).start()
