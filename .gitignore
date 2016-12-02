@@ -1,3 +1,5 @@
 start-tunnels.sh
 *.pyc
 local_settings.py
+tests.txt
+plot_surface.py
