@@ -6,7 +6,6 @@ from math import log # used in mutation
 
 import sys # to exit and append to path
 sys.path.append('../utils')
-sys.path.append('../timing')
 sys.path.append('../functions')
 
 import oa_utils # optimization algorithm utils

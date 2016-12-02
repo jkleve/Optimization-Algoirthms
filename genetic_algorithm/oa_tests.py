@@ -7,6 +7,7 @@ import sys
 sys.path.append('../functions')
 sys.path.append('../utils')
 
+from oa_utils import write_xy_data
 import regression_utils
 
 from genetic_algorithm import GA as OptimizationAlgorithm
@@ -57,16 +58,22 @@ def func_val_vs_iterations(o_algorithm, num_parts):
     fig.savefig(fig_name + '.png')
     plt.close(fig)
 
+# saves all test data to file
 # x1_name: name of setting in settings file
 # x2_name: name of setting in settings file
-def two_d_response_surface(x1_start, x1_step, x1_end, \
+def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
+                           x1_start, x1_step, x1_end, \
                            x2_start, x2_step, x2_end, \
                            x1_name, x2_name, \
-                           population_size=50, num_tests_per_point=10, save_histograms=True):
+                           population_size=50, num_tests_per_point=10, plot=True, \
+                           save_histograms=True, response_surface=True):
+    if response_surface:
+        plot = True
+
     tests = {}
     hist_num_bins = 150
 
-    settings['population_size'] = population_size
+    o_settings['population_size'] = population_size
     num_tests_per = num_tests_per_point
     x1_srt = x1_start
     x1_e   = x1_end
@@ -81,17 +88,16 @@ def two_d_response_surface(x1_start, x1_step, x1_end, \
 
     n = 0
 
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, projection='3d')
-    ax1.set_zlim(0, 1)
-
-    #ax2 = fig.add_subplot(212, projection='3d')
+    if plot:
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111, projection='3d')
+        ax1.set_zlim(0, 1)
 
     for i in np.arange(x1_srt, x1_e+x1_stp, x1_stp):
         for j in np.arange(x2_srt, x2_e+x2_stp, x2_stp):
             # set settings for this test
-            settings[x1_name] = i
-            settings[x2_name] = j
+            o_settings[x1_name] = i
+            o_settings[x2_name] = j
 
             # initial variables
             values = []
@@ -106,7 +112,7 @@ def two_d_response_surface(x1_start, x1_step, x1_end, \
 
             # run optimization algorithm
             for k in range(0,num_tests_per):
-                algorithm = OptimizationAlgorithm(settings, objective_function)
+                algorithm = o_algorithm(o_settings, o_function)
                 algorithm.run()
                 # save enf values
                 values.append(algorithm.get_best_x().get_fitness())
@@ -121,7 +127,8 @@ def two_d_response_surface(x1_start, x1_step, x1_end, \
             #avg = sum(values)/len(values)
             avg = median(values)
             tests[test_name] = avg
-            ax1.scatter(i,j,avg)
+            if plot:
+                ax1.scatter(i,j,avg)
 
             X[n][1] = i
             X[n][2] = j
@@ -133,38 +140,38 @@ def two_d_response_surface(x1_start, x1_step, x1_end, \
             # increment test number
             n += 1
 
-    # get regression coefficients
-    b = regression_utils.get_regression_coef(X, y)
+    fname = x1_name + x2_name + '.dat'
+    write_xy_data(X, y, fname)
 
     print("\n*** DATA ***")
     print("X")
     print(X)
     print("\ny")
     print(y)
-    print("\nb")
-    print(b)
     print("\ntests")
     print(tests)
     print("\nPlotting ...")
 
-    pltx = np.arange(x1_start, x1_end+x1_step, x1_step)
-    plty = np.arange(x2_start, x2_end+x2_step, x2_step)
-    pltX, pltY = np.meshgrid(pltx, plty)
-    F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
-    ax1.plot_wireframe(pltX, pltY, F)
+    if response_surface:
+        # get regression coefficients
+        b = regression_utils.get_regression_coef(X, y)
 
-    ax1.set_xlabel('Selection Cutoff')
-    ax1.set_ylabel('Mutation Rate')
-    ax1.set_zlabel('Median Objective Function Value')
-    plt.show()
+        pltx = np.arange(x1_start, x1_end+x1_step, x1_step)
+        plty = np.arange(x2_start, x2_end+x2_step, x2_step)
+        pltX, pltY = np.meshgrid(pltx, plty)
+        F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
+        ax1.plot_wireframe(pltX, pltY, F)
+
+    if plot:
+        ax1.set_xlabel('Selection Cutoff')
+        ax1.set_ylabel('Mutation Rate')
+        ax1.set_zlabel('Median Objective Function Value')
+        plt.show()
+
+    return (X, y)
 
 
-if __name__ == "__main__":
-
-    #num_particles = [50, 100, 500]# + range(1000, 10000, 1000)
-    #tests = num_parts_vs_time(OptimizationAlgorithm, num_particles)
-
-    #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
+def ga_data_points():
     x1_start = 0.3
     x1_step = 0.1
     x1_end = 0.6
@@ -174,6 +181,14 @@ if __name__ == "__main__":
     x1_name = "selection_cutoff"
     x2_name = "mutation_rate"
 
-    two_d_response_surface(x1_start, x1_step, x1_end, \
+    get_two_d_accuracy(OptimizationAlgorithm, settings, objective_function, \
+                           x1_start, x1_step, x1_end, \
                            x2_start, x2_step, x2_end, \
                            x1_name, x2_name)
+
+if __name__ == "__main__":
+
+    #num_particles = [50, 100, 500]# + range(1000, 10000, 1000)
+    #tests = num_parts_vs_time(OptimizationAlgorithm, num_particles)
+
+    #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
