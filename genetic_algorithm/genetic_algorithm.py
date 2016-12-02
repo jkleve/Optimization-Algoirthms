@@ -26,7 +26,7 @@ class Organism:
         self.id = id
         self.pos = pos
         self.func = func
-        self.fitness = self.get_fitness()
+        self.fitness = self.get_fval()
 
     def __str__(self):
         x_str = "["
@@ -37,7 +37,7 @@ class Organism:
                 (self.id, self.fitness, x_str)
 
     # TODO to make this a class function with a pos parameter??
-    def get_fitness(self):
+    def get_fval(self):
         return self.func(self.pos)
 
 class GA(Timer, object):

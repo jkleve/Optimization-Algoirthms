@@ -2,17 +2,23 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
+import threading
+from threading import Thread
 from statistics import median
 import sys
+sys.path.append('../genetic_algorithm')
+sys.path.append('../particle_swarm_optimization')
 sys.path.append('../functions')
 sys.path.append('../utils')
 
-from oa_utils import write_xy_data
+from oa_utils import optimize_settings, write_xy_data
 import regression_utils
 
-from genetic_algorithm import GA as OptimizationAlgorithm
-from ga_settings import settings
-from ackley_function import objective_function
+from genetic_algorithm import GA
+import ga_settings
+from particle_swarm_optimization import PSO
+import pso_settings
+import ackley_function
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -70,6 +76,9 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     if response_surface:
         plot = True
 
+    # turn off settings that slow us down
+    o_settings = optimize_settings(o_settings)
+
     tests = {}
     hist_num_bins = 150
 
@@ -115,7 +124,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 algorithm = o_algorithm(o_settings, o_function)
                 algorithm.run()
                 # save enf values
-                values.append(algorithm.get_best_x().get_fitness())
+                values.append(algorithm.get_best_x().get_fval())
 
             # save histogram if true
             if save_histograms:
@@ -140,7 +149,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
             # increment test number
             n += 1
 
-    fname = x1_name + x2_name + '.dat'
+    fname = x1_name + ',' + x2_name + '.dat'
     write_xy_data(X, y, fname)
 
     print("\n*** DATA ***")
@@ -170,8 +179,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 
     return (X, y)
 
-
-def ga_data_points():
+def ga_data_points(o_algorithm, settings, o_function):
     x1_start = 0.3
     x1_step = 0.1
     x1_end = 0.6
@@ -181,10 +189,25 @@ def ga_data_points():
     x1_name = "selection_cutoff"
     x2_name = "mutation_rate"
 
-    get_two_d_accuracy(OptimizationAlgorithm, settings, objective_function, \
-                           x1_start, x1_step, x1_end, \
-                           x2_start, x2_step, x2_end, \
-                           x1_name, x2_name)
+    return get_two_d_accuracy(o_algorithm, settings, o_function, \
+                              x1_start, x1_step, x1_end, \
+                              x2_start, x2_step, x2_end, \
+                              x1_name, x2_name)
+
+def pso_data_points(o_algorithm, settings, o_function):
+    x1_start = 0.0
+    x1_step = 0.1
+    x1_end = 1.0
+    x2_start = 0.0
+    x2_step = 0.1
+    x2_end = 1.0
+    x1_name = "cp"
+    x2_name = "cg"
+
+    return get_two_d_accuracy(o_algorithm, settings, o_function, \
+                              x1_start, x1_step, x1_end, \
+                              x2_start, x2_step, x2_end, \
+                              x1_name, x2_name)
 
 if __name__ == "__main__":
 
@@ -192,3 +215,15 @@ if __name__ == "__main__":
     #tests = num_parts_vs_time(OptimizationAlgorithm, num_particles)
 
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
+
+#    pso_data_points(PSO, pso_settings.settings, ackley_function.objective_function)
+    #ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
+    #sys.exit()
+
+    Thread( target = ga_data_points, \
+            args = (GA, ga_settings.settings, ackley_function.objective_function) \
+          ).start()
+
+    Thread( target = pso_data_points, \
+            args = (PSO, pso_settings.settings, ackley_function.objective_function) \
+          ).start()

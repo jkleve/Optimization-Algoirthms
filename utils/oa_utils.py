@@ -1,5 +1,14 @@
 import random
 
+def optimize_settings(s):
+    s['time_delay'] = 0.0
+    s['step_through'] = False
+    s['plot'] = False
+    s['print_actions'] = False
+    s['print_iterations'] = False
+    s['time'] = False
+    return s
+
 def gen_random_numbers(bounds):
     b = bounds
     return [random.uniform(b[i][0], b[i][1]) for i in range(0, len(bounds))]

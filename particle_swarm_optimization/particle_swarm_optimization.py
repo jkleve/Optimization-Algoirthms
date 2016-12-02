@@ -142,7 +142,7 @@ class PSO:
     @staticmethod
     def __update_position(population): # TODO put bounds on what position can be updated to
         for p in population:
-            p.pos = map(add, p.pos, p.velocity)
+            p.pos = list(map(add, p.pos, p.velocity))
             p.fval = p.get_fval()
         return population
 
@@ -207,9 +207,9 @@ class PSO:
 
     def run(self):
             # iterate over generations
-        while settings['num_iterations'] > pso.num_iterations:
-            pso.do_loop()
-            time.sleep(settings['time_delay'])
+        while self.settings['num_iterations'] > self.num_iterations:
+            self.do_loop()
+            time.sleep(self.settings['time_delay'])
 
 ########################################################################################
 #                                     MAIN                                             #
