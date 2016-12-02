@@ -4,9 +4,11 @@ from matplotlib import cm
 import numpy as np
 from statistics import median
 import sys
+sys.path.append('../functions')
+sys.path.append('../utils')
 
 from genetic_algorithm import GA as OptimizationAlgorithm
-from ackley_settings import settings
+from ga_settings import settings
 from ackley_function import objective_function
 
 def num_parts_vs_time(o_algorithm, num_parts):
