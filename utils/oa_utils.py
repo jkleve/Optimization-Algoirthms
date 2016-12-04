@@ -1,5 +1,11 @@
 import random
 
+def set_rosenbrock_bounds(s, num_dims):
+    if num_dims != 2:
+        print("set_rosenbrock_bounds not implemented for more than or less than 2 dimensions")
+    s['bounds'] = [(-2,2), (1,3)]
+    return s
+
 def optimize_settings(s):
     s['time_delay'] = 0.0
     s['step_through'] = False
