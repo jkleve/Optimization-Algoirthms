@@ -8,7 +8,6 @@ settings = {
     'num_iterations': 100,
     'time_delay': 0.0,
     ##### Leave these between 0 and 1 #####
-
     'cp': 0.2,          # Weight that has the particles tend to go to local known minimum
     'cg': 0.8,          # Weight that has the particles tend to go to global minimum
     'weight': 0.5,      # this is only used when velocity_type is inertia... haven't really seen much change though when altering this
