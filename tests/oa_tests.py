@@ -226,11 +226,11 @@ def ga_data_points(o_algorithm, settings, o_function):
     # x1_name = "max_mutation_amount"
     # x2_name = "mutation_rate"
 
-    return get_two_d_accuracy(o_algorithm, settings, o_function, \
+    get_two_d_accuracy(o_algorithm, settings, o_function, \
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
-                              population_size=50, num_tests_per_point=10, plot=True, \
+                              population_size=20, num_tests_per_point=10, plot=True, \
                               save_histograms=False, response_surface=False \
                              )
 
@@ -260,7 +260,8 @@ if __name__ == "__main__":
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
     #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
-    ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
+    (X, y) = ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
+    write_xy_data(X, y, 'ga_rate_vs_cutoff_griewank'):
     sys.exit()
 
     Process( target = ga_data_points, \
