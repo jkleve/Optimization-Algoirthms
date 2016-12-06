@@ -131,6 +131,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 algorithm.run()
                 # save enf values
                 values.append(algorithm.get_best_x().get_fval())
+                # euclidean distance
                 squares = 0
                 for square in algorithm.get_best_x().pos:
                     if o_function != rosenbrock_function.objective_function:
