@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
     #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
     (X, y) = ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
-    write_xy_data(X, y, 'ga_rate_vs_cutoff_griewank'):
+    write_xy_data(X, y, 'ga_rate_vs_cutoff_griewank')
     sys.exit()
 
     Process( target = ga_data_points, \
