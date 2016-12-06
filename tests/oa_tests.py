@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
+import math
 #import threading
 #from threading import Thread
 from multiprocessing import Process
-from statistics import median
+# from statistics import median
 import sys
 sys.path.append('../genetic_algorithm')
 sys.path.append('../particle_swarm_optimization')
@@ -19,7 +20,7 @@ from genetic_algorithm import GA
 import ga_settings
 from particle_swarm_optimization import PSO
 import pso_settings
-import ackley_function
+import rosenbrock_function
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -135,7 +136,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 
             # find average and save data
             #avg = sum(values)/len(values)
-            avg = median(values)
+            avg = sum(values)/float(len(values))
             tests[test_name] = avg
             if plot:
                 ax1.scatter(i,j,avg)
@@ -175,7 +176,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     if plot:
         ax1.set_xlabel('Selection Cutoff')
         ax1.set_ylabel('Mutation Rate')
-        ax1.set_zlabel('Median Objective Function Value')
+        ax1.set_zlabel('Mean Objective Function Value')
         plt.show()
 
     return (X, y)
@@ -199,11 +200,11 @@ def ga_data_points(o_algorithm, settings, o_function):
                              )
 
 def pso_data_points(o_algorithm, settings, o_function):
-    x1_start = 0.0
-    x1_step = 0.1
-    x1_end = 1.0
-    x2_start = 0.0
-    x2_step = 0.1
+    x1_start = 0.1
+    x1_step = 0.05
+    x1_end = 0.5
+    x2_start = 0.6
+    x2_step = 0.05
     x2_end = 1.0
     x1_name = "cp"
     x2_name = "cg"
@@ -212,7 +213,7 @@ def pso_data_points(o_algorithm, settings, o_function):
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
-                              population_size=50, num_tests_per_point=50, plot=False, \
+                              population_size=50, num_tests_per_point=50, plot=True, \
                               save_histograms=False, response_surface=False \
                              )
 
@@ -223,9 +224,9 @@ if __name__ == "__main__":
 
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
-#    pso_data_points(PSO, pso_settings.settings, ackley_function.objective_function)
-    #ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
-    #sys.exit()
+    pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
+    # ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
+    sys.exit()
 
     Process( target = ga_data_points, \
             args = (GA, ga_settings.settings, ackley_function.objective_function) \
