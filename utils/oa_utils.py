@@ -64,7 +64,7 @@ def read_xy_data(filename):
 
         for i, row_str in enumerate(f):
             row = row_str.split(',')
-            y[i] = [-1]
+            y[i] = row[-1]
             for j, var in enumerate(row[0:-1]):
                 x[i,j] = var
 

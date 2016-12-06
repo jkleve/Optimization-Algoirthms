@@ -2,6 +2,10 @@ import matplotlib.pyplot as plt # plotting
 import matplotlib.mlab as mlab
 import numpy as np
 
+import sys
+sys.path.append("../functions")
+import rosenbrock_function
+
 class PlotUtils:
 
     def __init__(self, num_dims, bounds, func):
@@ -37,7 +41,10 @@ class PlotUtils:
         # over the line segments of the contour, removing the lines beneath
         # the label
         #plt.figure()
-        CS = plt.contour(X, Y, Z)
+        if func == rosenbrock_function.objective_function:
+            CS = plt.contour(X, Y, Z, range(0,11) + range(100, 1000, 100))
+        else:
+            CS = plt.contour(X, Y, Z)
         plt.clabel(CS, inline=1, fontsize=10)
         plt.title('Simplest default with labels')
 
