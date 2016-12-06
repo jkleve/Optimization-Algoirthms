@@ -6,7 +6,7 @@ from math import log # used in mutation
 
 import sys # to exit and append to path
 sys.path.append('../utils')
-sys.path.append('../timing')
+sys.path.append('../functions')
 
 import oa_utils # optimization algorithm utils
 from timer import Timer
@@ -26,7 +26,7 @@ class Organism:
         self.id = id
         self.pos = pos
         self.func = func
-        self.fitness = self.get_fitness()
+        self.fitness = self.get_fval()
 
     def __str__(self):
         x_str = "["
@@ -37,7 +37,7 @@ class Organism:
                 (self.id, self.fitness, x_str)
 
     # TODO to make this a class function with a pos parameter??
-    def get_fitness(self):
+    def get_fval(self):
         return self.func(self.pos)
 
 class GA(Timer, object):
@@ -336,7 +336,7 @@ if __name__ == "__main__":
     if args.function:
         function_module = importlib.import_module(args.function[0])
     else:
-        function_module = importlib.import_module('ga_objective_function')
+        function_module = importlib.import_module('ackley_function')
     function = function_module.objective_function
 
     # get settings
