@@ -20,7 +20,9 @@ import ga_settings
 from particle_swarm_optimization import PSO
 import pso_settings
 import ackley_function
+import easom_function
 import rosenbrock_function
+import griewank_function
 
 def gen_filename(x1_name, x2_name):
     return x1_name + ',' + x2_name + '.dat'
@@ -77,7 +79,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                            x2_start, x2_step, x2_end, \
                            x1_name, x2_name, \
                            population_size=50, num_tests_per_point=10, plot=True, \
-                           save_histograms=True, response_surface=True):
+                           save_histograms=True, response_surface=True, debug=False):
     if response_surface:
         plot = True
 
@@ -105,7 +107,8 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     if plot:
         fig = plt.figure()
         ax1 = fig.add_subplot(111, projection='3d')
-        ax1.set_zlim(0, 1)
+        if o_function != griewank_function.objective_function:
+            ax1.set_zlim(0, 1)
 
     for i in np.arange(x1_srt, x1_e+x1_stp, x1_stp):
         for j in np.arange(x2_srt, x2_e+x2_stp, x2_stp):
@@ -169,13 +172,14 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     fname = gen_filename(x1_name, x2_name)
     write_xy_data(X, y, fname)
 
-    print("\n*** DATA ***")
-    print("X")
-    print(X)
-    print("\ny")
-    print(y)
-    print("\ntests")
-    print(tests)
+    if debug:
+        print("\n*** DATA ***")
+        print("X")
+        print(X)
+        print("\ny")
+        print(y)
+        print("\ntests")
+        print(tests)
 
     if response_surface:
         # get regression coefficients
@@ -193,27 +197,35 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
         x2_name = x2_name[0].upper() + x2_name[1:]
         ax1.set_xlabel(x1_name)
         ax1.set_ylabel(x2_name)
-        ax1.set_zlabel('Average Objective Function Value')
+        ax1.set_zlabel('Average Euclidean Distance from Global Minimum')
         plt.show()
 
     return (X, y)
 
 def ga_data_points(o_algorithm, settings, o_function):
-    x1_start = 0.3
+    x1_start = 0.5
     x1_step = 0.1
-    x1_end = 0.7
-    x2_start = 0.15
-    x2_step = 0.05
-    x2_end = 1.0
+    x1_end = 0.9
+    x2_start = 0.6
+    x2_step = 0.1
+    x2_end = 0.9
     x1_name = "selection_cutoff"
     x2_name = "mutation_rate"
+    # x1_start = 0.5
+    # x1_step = 0.5
+    # x1_end = 1.0
+    # x2_start = 0.1
+    # x2_step = 0.1
+    # x2_end = 0.4
+    # x1_name = "max_mutation_amount"
+    # x2_name = "mutation_rate"
 
     return get_two_d_accuracy(o_algorithm, settings, o_function, \
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
-                              population_size=50, num_tests_per_point=50, plot=False, \
-                              save_histograms=True, response_surface=False \
+                              population_size=50, num_tests_per_point=10, plot=True, \
+                              save_histograms=False, response_surface=False \
                              )
 
 def pso_data_points(o_algorithm, settings, o_function):
@@ -241,8 +253,8 @@ if __name__ == "__main__":
 
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
-    pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
-    #ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
+    #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
+    ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
     sys.exit()
 
     Process( target = ga_data_points, \
