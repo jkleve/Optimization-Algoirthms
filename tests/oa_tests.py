@@ -20,6 +20,7 @@ from genetic_algorithm import GA
 import ga_settings
 from particle_swarm_optimization import PSO
 import pso_settings
+import ackley_function
 import rosenbrock_function
 
 def num_parts_vs_time(o_algorithm, num_parts):
@@ -112,6 +113,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 
             # initial variables
             values = []
+            euclid_distance = []
             test_name = x1_name + '(' + str(i) + ')'+ ',' + x2_name + '(' + str(j) + ')'
 
             print("Running test %s" % test_name)
@@ -127,6 +129,13 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 algorithm.run()
                 # save enf values
                 values.append(algorithm.get_best_x().get_fval())
+                squares = 0
+                for square in algorithm.get_best_x().pos:
+                    if o_function != rosenbrock_function.objective_function:
+                        squares += square**2
+                    else:
+                        squares += (square-1)**2
+                euclid_distance.append(np.sqrt(squares))
 
             # save histogram if true
             if save_histograms:
@@ -136,7 +145,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 
             # find average and save data
             #avg = sum(values)/len(values)
-            avg = sum(values)/float(len(values))
+            avg = sum(euclid_distance)/float(len(euclid_distance))
             tests[test_name] = avg
             if plot:
                 ax1.scatter(i,j,avg)
@@ -200,11 +209,11 @@ def ga_data_points(o_algorithm, settings, o_function):
                              )
 
 def pso_data_points(o_algorithm, settings, o_function):
-    x1_start = 0.1
-    x1_step = 0.05
-    x1_end = 0.5
-    x2_start = 0.6
-    x2_step = 0.05
+    x1_start = 0.0
+    x1_step = 0.1
+    x1_end = 1.0
+    x2_start = 0.0
+    x2_step = 0.1
     x2_end = 1.0
     x1_name = "cp"
     x2_name = "cg"
@@ -224,7 +233,7 @@ if __name__ == "__main__":
 
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
-    pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
+    pso_data_points(PSO, pso_settings.settings, ackley_function.objective_function)
     # ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
     sys.exit()
 
