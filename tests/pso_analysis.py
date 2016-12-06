@@ -97,7 +97,7 @@ def cmp_func_val_over_iterations(o_algorithm, settings, o_function):
     ax1.legend(tests1)
     ax2.legend(tests2)
     ax3.legend(tests3)
-    varient = varient[0].upper() + varient[1:-1]
+    varient = varient[0].upper() + varient[1:]
     ax1.set_title(varient + ' PSO Comparison of Cp & Cg on Easom Function (50 particles)')
     ax1.set_xlabel('Number of Iterations')
     ax2.set_xlabel('Number of Iterations')

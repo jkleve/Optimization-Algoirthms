@@ -19,7 +19,7 @@ from oa_utils import read_xy_data, optimize_settings
 from regression_utils import get_regression_coef
 
 def cmp_selection_cutoff_vs_mutation_rate():
-    X, y = read_xy_data('selection_cutoff,mutation_rate.dat')
+    X, y = read_xy_data('selection_cutoff,mutation_rate_ackley.dat')
 
     b = get_regression_coef(X, y)
 
@@ -109,8 +109,8 @@ def cmp_func_val_over_iterations(o_algorithm, settings, o_function):
     plt.show()
 
 if __name__ == "__main__":
-    #cmp_selection_cutoff_vs_mutation_rate()
+    cmp_selection_cutoff_vs_mutation_rate()
 
-    cmp_func_val_over_iterations(genetic_algorithm.GA, \
-                                 ga_settings.settings, \
-                                 ackley_function.objective_function)
+    #cmp_func_val_over_iterations(genetic_algorithm.GA, \
+    #                             ga_settings.settings, \
+    #                             ackley_function.objective_function)

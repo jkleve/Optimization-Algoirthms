@@ -20,6 +20,10 @@ import ga_settings
 from particle_swarm_optimization import PSO
 import pso_settings
 import ackley_function
+import rosenbrock_function
+
+def gen_filename(x1_name, x2_name):
+    return x1_name + ',' + x2_name + '.dat'
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -111,6 +115,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 
             # initial variables
             values = []
+            euclid_distance = []
             test_name = x1_name + '(' + str(i) + ')'+ ',' + x2_name + '(' + str(j) + ')'
 
             print("Running test %s" % test_name)
@@ -126,16 +131,24 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 algorithm.run()
                 # save enf values
                 values.append(algorithm.get_best_x().get_fval())
+                squares = 0
+                for square in algorithm.get_best_x().pos:
+                    if o_function != rosenbrock_function.objective_function:
+                        squares += square**2
+                    else:
+                        squares += (square-1)**2
+                euclid_distance.append(np.sqrt(squares))
 
             # save histogram if true
             if save_histograms:
-                hist_ax.hist(values, hist_num_bins, range=(0, 1.5))
+                hist_ax.hist(values, hist_num_bins, range=(0, 1.5), normed=True)
                 hist_fig.savefig(test_name + '.png')
                 plt.close(hist_fig)
 
             # find average and save data
             #avg = sum(values)/len(values)
-            avg = median(values)
+            #avg = median(values)
+            avg = median(euclid_distance)
             tests[test_name] = avg
             if plot:
                 ax1.scatter(i,j,avg)
@@ -150,7 +163,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
             # increment test number
             n += 1
 
-    fname = x1_name + ',' + x2_name + '.dat'
+    fname = gen_filename(x1_name, x2_name)
     write_xy_data(X, y, fname)
 
     print("\n*** DATA ***")
@@ -160,7 +173,6 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     print(y)
     print("\ntests")
     print(tests)
-    print("\nPlotting ...")
 
     if response_surface:
         # get regression coefficients
@@ -173,9 +185,12 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
         ax1.plot_wireframe(pltX, pltY, F)
 
     if plot:
-        ax1.set_xlabel('Selection Cutoff')
-        ax1.set_ylabel('Mutation Rate')
-        ax1.set_zlabel('Median Objective Function Value')
+        print("\nPlotting ...")
+        x1_name = x1_name[0].upper() + x1_name[1:]
+        x2_name = x2_name[0].upper() + x2_name[1:]
+        ax1.set_xlabel(x1_name)
+        ax1.set_ylabel(x2_name)
+        ax1.set_zlabel('Average Objective Function Value')
         plt.show()
 
     return (X, y)
@@ -183,10 +198,10 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 def ga_data_points(o_algorithm, settings, o_function):
     x1_start = 0.3
     x1_step = 0.1
-    x1_end = 0.6
-    x2_start = 0.2
-    x2_step = 0.1
-    x2_end = 0.4
+    x1_end = 0.7
+    x2_start = 0.15
+    x2_step = 0.05
+    x2_end = 1.0
     x1_name = "selection_cutoff"
     x2_name = "mutation_rate"
 
@@ -195,16 +210,16 @@ def ga_data_points(o_algorithm, settings, o_function):
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
                               population_size=50, num_tests_per_point=50, plot=False, \
-                              save_histograms=False, response_surface=False \
+                              save_histograms=True, response_surface=False \
                              )
 
 def pso_data_points(o_algorithm, settings, o_function):
     x1_start = 0.0
     x1_step = 0.1
-    x1_end = 1.0
-    x2_start = 0.0
+    x1_end = 0.4
+    x2_start = 0.6
     x2_step = 0.1
-    x2_end = 1.0
+    x2_end = 0.9
     x1_name = "cp"
     x2_name = "cg"
 
@@ -212,8 +227,8 @@ def pso_data_points(o_algorithm, settings, o_function):
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
-                              population_size=50, num_tests_per_point=50, plot=False, \
-                              save_histograms=False, response_surface=False \
+                              population_size=50, num_tests_per_point=50, plot=True, \
+                              save_histograms=False, response_surface=True \
                              )
 
 if __name__ == "__main__":
@@ -223,14 +238,14 @@ if __name__ == "__main__":
 
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
-#    pso_data_points(PSO, pso_settings.settings, ackley_function.objective_function)
+    pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
     #ga_data_points(GA, ga_settings.settings, ackley_function.objective_function)
-    #sys.exit()
+    sys.exit()
 
     Process( target = ga_data_points, \
-            args = (GA, ga_settings.settings, ackley_function.objective_function) \
+            args = (GA, ga_settings.settings, rosenbrock_function.objective_function) \
           ).start()
 
     Process( target = pso_data_points, \
-            args = (PSO, pso_settings.settings, ackley_function.objective_function) \
+            args = (PSO, pso_settings.settings, rosenbrock_function.objective_function) \
           ).start()

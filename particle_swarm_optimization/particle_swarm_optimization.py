@@ -8,7 +8,7 @@ import copy
 
 import sys # to exit and append to path
 sys.path.append('../utils')
-sys.path.append('../timing')
+sys.path.append('../functions')
 
 import oa_utils # optimization algorithm utils
 from timer import Timer
@@ -55,7 +55,7 @@ class Particle:
     def get_velocity(self):
         return self.velocity
 
-class PSO:
+class PSO(Timer, object):
     """A particle swarm class that contains methods for handling
     the population over iterations
 
@@ -66,6 +66,7 @@ class PSO:
     """
 
     def __init__(self, settings, function): # TODO add settings parameter
+        super(self.__class__, self).__init__()
         # read in settings
 
         num_dims        = settings['number_of_dimensions']
