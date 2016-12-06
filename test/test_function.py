@@ -6,12 +6,14 @@ import numpy as np
 import sys
 sys.path.append('../functions')
 
-from easom_function import objective_function
+from quadratic_function import objective_function
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 X = np.arange(-10, 10, .25)
 Y = np.arange(-10, 10, .25)
+#X = np.arange(-1.5, 1.5, .05)
+#Y = np.arange(-0.5, 2, .05)
 X, Y = np.meshgrid(X, Y)
 params = [X, Y]
 Z = objective_function(params)
