@@ -134,10 +134,12 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 # euclidean distance
                 squares = 0
                 for square in algorithm.get_best_x().pos:
-                    if o_function != rosenbrock_function.objective_function:
-                        squares += square**2
-                    else:
+                    if o_function == rosenbrock_function.objective_function:
                         squares += (square-1)**2
+                    elif o_function == easom_function.objective_function:
+                        squares += (square-np.pi)**2
+                    else:
+                        squares += square**2
                 euclid_distance.append(np.sqrt(squares))
 
             # save histogram if true
