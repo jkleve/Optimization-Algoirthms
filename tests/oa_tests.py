@@ -203,12 +203,18 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     return (X, y)
 
 def ga_data_points(o_algorithm, settings, o_function):
-    x1_start = 0.5
+    x1_start = 0.1
     x1_step = 0.1
-    x1_end = 0.9
-    x2_start = 0.6
+    x1_end = 1.0
+    x2_start = 0.1
     x2_step = 0.1
-    x2_end = 0.9
+    x2_end = 1.0
+    # x1_start = 0.5
+    # x1_step = 0.1
+    # x1_end = 0.9
+    # x2_start = 0.6
+    # x2_step = 0.1
+    # x2_end = 0.9
     x1_name = "selection_cutoff"
     x2_name = "mutation_rate"
     # x1_start = 0.5
