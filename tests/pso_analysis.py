@@ -31,7 +31,7 @@ def cmp_cp_vs_cg():
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
-    ax1.set_zlim(0, 1.0)
+    ax1.set_zlim(0, 4)
 
     for i, row in enumerate(X):
         ax1.scatter(row[1],row[2],y[i])
@@ -97,7 +97,7 @@ def cmp_func_val_over_iterations(o_algorithm, settings, o_function):
     ax1.legend(tests1)
     ax2.legend(tests2)
     ax3.legend(tests3)
-    
+
     variant = variant[0].upper() + variant[1:]
     ax1.set_title(variant + ' PSO Comparison of Cp & Cg on Easom Function (50 particles)')
 

@@ -22,6 +22,8 @@ from particle_swarm_optimization import PSO
 import pso_settings
 import ackley_function
 import rosenbrock_function
+import easom_function
+import griewank_function
 
 def gen_filename(x1_name, x2_name):
     return x1_name + ',' + x2_name + '.dat'
@@ -218,12 +220,12 @@ def ga_data_points(o_algorithm, settings, o_function):
                              )
 
 def pso_data_points(o_algorithm, settings, o_function):
-    x1_start = 0.0
+    x1_start = 0.05
     x1_step = 0.1
-    x1_end = 0.4
-    x2_start = 0.6
+    x1_end = 0.95
+    x2_start = 0.05
     x2_step = 0.1
-    x2_end = 0.9
+    x2_end = 0.95
     x1_name = "cp"
     x2_name = "cg"
 
@@ -247,7 +249,7 @@ if __name__ == "__main__":
     sys.exit()
 
     Process( target = ga_data_points, \
-            args = (GA, ga_settings.settings, rosenbrock_function.objective_function) \
+            args = (GA, ga_settings.settings, ackley_function.objective_function) \
           ).start()
 
     Process( target = pso_data_points, \
