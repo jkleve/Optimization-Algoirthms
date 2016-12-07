@@ -227,7 +227,7 @@ def ga_data_points(o_algorithm, settings, o_function):
     # x1_name = "max_mutation_amount"
     # x2_name = "mutation_rate"
 
-    get_two_d_accuracy(o_algorithm, settings, o_function, \
+    return get_two_d_accuracy(o_algorithm, settings, o_function, \
                               x1_start, x1_step, x1_end, \
                               x2_start, x2_step, x2_end, \
                               x1_name, x2_name, \
