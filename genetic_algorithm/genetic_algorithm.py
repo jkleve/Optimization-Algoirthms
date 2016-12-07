@@ -72,6 +72,9 @@ class GA(Timer, object):
         self.total_organisms = len(self.population)
         self.best_x          = self.population[0]
         self.num_generations = 1
+        # stopping criteria variables
+        self.func_val_improvement       = 0
+        self.num_iter_since_improvement = 0
 
         if settings['plot']:
             try:
@@ -297,6 +300,8 @@ class GA(Timer, object):
         self.num_generations += 1
 
         if self.population[0].fitness < self.best_x.fitness:
+            # add on the improvement in function value
+            self.func_val_improvement += (self.best_x.fitness - self.population[0].fitness)
             self.best_x = self.population[0]
 
         if self.settings['plot']:
@@ -309,10 +314,27 @@ class GA(Timer, object):
             oa_utils.pause()
 
     def run(self):
-            # iterate over generations
+        # iterate over generations
         while self.settings['num_iterations'] > self.num_generations:
             self.do_loop()
+
+            # check if we've improved our function value
+            if self.func_val_improvement > self.settings['stopping_criteria']:
+                self.func_val_improvement = 0
+                self.num_iter_since_improvement = 0
+            else:
+                self.num_iter_since_improvement += 1
+
+            # check if we haven't improved at all in num of stopping criteria steps
+            if self.num_iter_since_improvement > self.settings['num_iter_stop_criteria']:
+                print("Stopping criteria met after %d number of iterations" % self.num_generations)
+                break
+
+            # pause for a bit if setting is set
             time.sleep(self.settings['time_delay'])
+
+        if self.num_generations > self.settings['num_iterations']:
+            print("Maximum number of iterations hit (%d)" % self.num_generations)
 
 
 ########################################################################################
