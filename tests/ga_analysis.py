@@ -14,25 +14,57 @@ import rosenbrock_function
 import griewank_function
 import ga_settings
 
-
 from oa_utils import read_xy_data, optimize_settings
+from oa_test_helpers import gen_filename
 from regression_utils import get_regression_coef
 
-def cmp_selection_cutoff_vs_mutation_rate():
-    X, y = read_xy_data('selection_cutoff,mutation_rate_ackley.dat')
+# def cmp_selection_cutoff_vs_mutation_rate():
+#     X, y = read_xy_data('../data/ga/griewank/max_mutation_amount,mutation_rate.dat')
+#
+#     b = get_regression_coef(X, y)
+#
+#     x1_start = 0.1
+#     x1_step = 0.1
+#     x1_end = 1.0
+#     x2_start = 0.1
+#     x2_step = 0.1
+#     x2_end = 1.0
+#
+#     fig = plt.figure()
+#     ax1 = fig.add_subplot(111, projection='3d')
+#     ax1.set_zlim(3, 9)
+#
+#     for i, row in enumerate(X):
+#         ax1.scatter(row[1],row[2],y[i])
+#
+#     pltx = np.arange(x1_start, x1_end+x1_step, x1_step)
+#     plty = np.arange(x2_start, x2_end+x2_step, x2_step)
+#     pltX, pltY = np.meshgrid(pltx, plty)
+#     F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
+#     ax1.plot_wireframe(pltX, pltY, F)
+#     ax1.contour(pltX, pltY, F, zdir='z', offset=3, cmap=cm.jet)
+#
+#     ax1.set_title('Response Surface of Mutation Rate vs Selection Cutoff of GA on Griewank Function')
+#     ax1.set_xlabel('Selection Cutoff')
+#     ax1.set_ylabel('Mutation Rate')
+#     ax1.set_zlabel('Mean Euclidean Distance from Global Minimum')
+#     plt.show()
+
+def cmp_max_mutation_vs_mutation_rate():
+    X, y = read_xy_data('../data/ga/griewank/max_mutation_amount,mutation_rate.dat')
 
     b = get_regression_coef(X, y)
 
-    x1_start = 0.3
+    x1_start = 0.1
     x1_step = 0.1
-    x1_end = 0.6
-    x2_start = 0.2
+    x1_end = 1.0
+    x2_start = 0.1
     x2_step = 0.1
-    x2_end = 0.4
+    x2_end = 1.0
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
-    ax1.set_zlim(0, 1)
+    ax1.set_zlim(3, 9)
 
     for i, row in enumerate(X):
         ax1.scatter(row[1],row[2],y[i])
@@ -41,11 +73,13 @@ def cmp_selection_cutoff_vs_mutation_rate():
     plty = np.arange(x2_start, x2_end+x2_step, x2_step)
     pltX, pltY = np.meshgrid(pltx, plty)
     F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
-    #ax1.plot_wireframe(pltX, pltY, F)
+    ax1.plot_wireframe(pltX, pltY, F)
+    ax1.contour(pltX, pltY, F, zdir='z', offset=3, cmap=cm.jet)
 
-    ax1.set_xlabel('Selection Cutoff')
+    ax1.set_title('Response Surface of Mutation Rate vs Maximum Mutation Allowed of GA on Griewank Function')
+    ax1.set_xlabel('Mutation Amount')
     ax1.set_ylabel('Mutation Rate')
-    ax1.set_zlabel('Median Objective Function Value')
+    ax1.set_zlabel('Mean Euclidean Distance from Global Minimum')
     plt.show()
 
 def cmp_func_val_over_iterations(o_algorithm, settings, o_function):
@@ -108,8 +142,57 @@ def cmp_func_val_over_iterations(o_algorithm, settings, o_function):
     #plt.legend(tests)
     plt.show()
 
+def create_bulk_var_cmp_graphs():
+    import ga_tests
+
+    input_loc = '../tmp/'
+    output_loc = '../tmp/'
+
+    x1_start = 0.1
+    x1_step = 0.1
+    x1_end = 1.0
+    x2_start = 0.1
+    x2_step = 0.1
+    x2_end = 1.0
+
+    tests = ga_tests.tests
+    functions = ga_tests.functions
+
+    for f in functions:
+        for t in tests.items():
+            names = t[1]
+            x1_name = names['x1']
+            x2_name = names['x2']
+
+            filename = input_loc + gen_filename(x1_name, x2_name, f)
+            (X, y) = read_xy_data(filename)
+
+            b = get_regression_coef(X, y)
+
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111, projection='3d')
+            #ax1.set_zlim(3, 9)
+
+            for i, row in enumerate(X):
+                ax1.scatter(row[1],row[2],y[i])
+
+            pltx = np.arange(x1_start, x1_end+x1_step, x1_step)
+            plty = np.arange(x2_start, x2_end+x2_step, x2_step)
+            pltX, pltY = np.meshgrid(pltx, plty)
+            F = b[0] + b[1]*pltX + b[2]*pltY + b[3]*pltX*pltX + b[4]*pltX*pltY + b[5]*pltY*pltY
+            #ax1.plot_wireframe(pltX, pltY, F)
+            ax1.contour(pltX, pltY, F, zdir='z', offset=0, cmap=cm.jet)
+
+            ax1.set_title('Response Surface of Mutation Rate vs Selection Cutoff of GA on Griewank Function')
+            ax1.set_xlabel('Selection Cutoff')
+            ax1.set_ylabel('Mutation Rate')
+            ax1.set_zlabel('Mean Euclidean Distance from Global Minimum')
+            plt.show()
+
+
 if __name__ == "__main__":
-    cmp_selection_cutoff_vs_mutation_rate()
+    create_bulk_var_cmp_graphs()
+    #cmp_selection_cutoff_vs_mutation_rate()
 
     #cmp_func_val_over_iterations(genetic_algorithm.GA, \
     #                             ga_settings.settings, \
