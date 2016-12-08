@@ -2,10 +2,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
-#import threading
-#from threading import Thread
 from multiprocessing import Process
 #from statistics import median
+import time
 import sys
 sys.path.append('../genetic_algorithm')
 sys.path.append('../particle_swarm_optimization')
@@ -206,6 +205,8 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     return (X, y)
 
 def ga_data_points(o_algorithm, settings, o_function):
+    start_time = time.time()
+
     tests = {
                 't1': {
                         'x1': 'selection_cutoff',
@@ -246,6 +247,9 @@ def ga_data_points(o_algorithm, settings, o_function):
             print("Value Error??? :(")
         except:
             print("Error ??? :(")
+
+    print(" === %s took %d seconds === " % (o_function.func_globals['__name__'], \
+                                            time.time() - start_time))
 
 def pso_data_points(o_algorithm, settings, o_function):
     x1_start = 0.0
