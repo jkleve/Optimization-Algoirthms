@@ -12,6 +12,7 @@ sys.path.append('../functions')
 sys.path.append('../utils')
 
 from oa_utils import optimize_settings, write_xy_data
+from oa_test_helpers import gen_filename
 import regression_utils
 
 from genetic_algorithm import GA
@@ -24,8 +25,7 @@ import easom_function
 import rosenbrock_function
 import griewank_function
 
-def gen_filename(x1_name, x2_name, func_name):
-    return x1_name + '_' + x2_name + '_' + func_name + '.dat'
+import ga_tests
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -207,20 +207,8 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
 def ga_data_points(o_algorithm, settings, o_function):
     start_time = time.time()
 
-    tests = {
-                't1': {
-                        'x1': 'selection_cutoff',
-                        'x2': 'mutation_rate'
-                      },
-                't2': {
-                        'x1': 'selection_cutoff',
-                        'x2': 'max_mutation_amount'
-                      },
-                't3': {
-                        'x1': 'mutation_rate',
-                        'x2': 'max_mutation_amount'
-                      }
-            }
+    tests = ga_tests.tests
+
     x1_start = 0.1
     x1_step = 0.1
     x1_end = 1.0
