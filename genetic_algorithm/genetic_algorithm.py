@@ -327,14 +327,16 @@ class GA(Timer, object):
 
             # check if we haven't improved at all in num of stopping criteria steps
             if self.num_iter_since_improvement > self.settings['num_iter_stop_criteria']:
-                print("Stopping criteria met after %d number of iterations" % self.num_generations)
+                if self.settings['print_actions'] or self.settings['print_iterations']:
+                    print("Stopping criteria met after %d number of iterations" % self.num_generations)
                 break
 
             # pause for a bit if setting is set
             time.sleep(self.settings['time_delay'])
 
         if self.num_generations > self.settings['num_iterations']:
-            print("Maximum number of iterations hit (%d)" % self.num_generations)
+            if self.settings['print_actions'] or self.settings['print_iterations']:
+                print("Maximum number of iterations hit (%d)" % self.num_generations)
 
 
 ########################################################################################
