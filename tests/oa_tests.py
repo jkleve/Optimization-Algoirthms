@@ -17,6 +17,7 @@ import regression_utils
 
 from genetic_algorithm import GA
 import ga_settings
+import ga_ackley_settings
 from particle_swarm_optimization import PSO
 import pso_settings
 import ackley_function
@@ -24,8 +25,8 @@ import easom_function
 import rosenbrock_function
 import griewank_function
 
-def gen_filename(x1_name, x2_name):
-    return x1_name + ',' + x2_name + '.dat'
+def gen_filename(x1_name, x2_name, func_name):
+    return x1_name + '_' + x2_name + '_' + func_name + '.dat'
 
 def num_parts_vs_time(o_algorithm, num_parts):
     tests = {}
@@ -86,6 +87,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     # turn off settings that slow us down
     o_settings = optimize_settings(o_settings)
 
+    func_name = o_function.func_globals['__name__']
     tests = {}
     hist_num_bins = 150
 
@@ -170,7 +172,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
             # increment test number
             n += 1
 
-    fname = gen_filename(x1_name, x2_name)
+    fname = gen_filename(x1_name, x2_name, func_name)
     write_xy_data(X, y, fname)
 
     if debug:
@@ -204,36 +206,46 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
     return (X, y)
 
 def ga_data_points(o_algorithm, settings, o_function):
+    tests = {
+                't1': {
+                        'x1': 'selection_cutoff',
+                        'x2': 'mutation_rate'
+                      },
+                't2': {
+                        'x1': 'selection_cutoff',
+                        'x2': 'max_mutation_amount'
+                      },
+                't3': {
+                        'x1': 'mutation_rate',
+                        'x2': 'max_mutation_amount'
+                      }
+            }
     x1_start = 0.1
     x1_step = 0.1
     x1_end = 1.0
     x2_start = 0.1
     x2_step = 0.1
     x2_end = 1.0
-    # x1_start = 0.5
-    # x1_step = 0.1
-    # x1_end = 0.9
-    # x2_start = 0.6
-    # x2_step = 0.1
-    # x2_end = 0.9
-    x1_name = "selection_cutoff"
-    x2_name = "mutation_rate"
-    # x1_start = 0.5
-    # x1_step = 0.5
-    # x1_end = 1.0
-    # x2_start = 0.1
-    # x2_step = 0.1
-    # x2_end = 0.4
-    # x1_name = "max_mutation_amount"
-    # x2_name = "mutation_rate"
 
-    return get_two_d_accuracy(o_algorithm, settings, o_function, \
-                              x1_start, x1_step, x1_end, \
-                              x2_start, x2_step, x2_end, \
-                              x1_name, x2_name, \
-                              population_size=20, num_tests_per_point=10, plot=True, \
-                              save_histograms=False, response_surface=False \
-                             )
+    for t in tests.items():
+        names = t[1]
+        x1_name = names['x1']
+        x2_name = names['x2']
+
+        try:
+            get_two_d_accuracy(o_algorithm, settings, o_function, \
+                               x1_start, x1_step, x1_end, \
+                               x2_start, x2_step, x2_end, \
+                               x1_name, x2_name, \
+                               population_size=20, num_tests_per_point=10, plot=True, \
+                               save_histograms=False, response_surface=False \
+                              )
+        except TypeError:
+            print("Type Error??? :(")
+        except ValueError:
+            print("Value Error??? :(")
+        except:
+            print("Error ??? :(")
 
 def pso_data_points(o_algorithm, settings, o_function):
     x1_start = 0.0
@@ -261,14 +273,22 @@ if __name__ == "__main__":
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
     #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
-    (X, y) = ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
-    write_xy_data(X, y, 'ga_rate_vs_cutoff_griewank')
-    sys.exit()
+    #ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
+    #sys.exit()
 
+    # ackley
+    Process( target = ga_data_points, \
+            args = (GA, ga_ackley_settings.settings, ackley_function.objective_function) \
+          ).start()
+    # easom
+    Process( target = ga_data_points, \
+            args = (GA, ga_settings.settings, easom_function.objective_function) \
+          ).start()
+    # griewank
+    Process( target = ga_data_points, \
+            args = (GA, ga_settings.settings, griewank_function.objective_function) \
+          ).start()
+    # rosenbrock
     Process( target = ga_data_points, \
             args = (GA, ga_settings.settings, rosenbrock_function.objective_function) \
-          ).start()
-
-    Process( target = pso_data_points, \
-            args = (PSO, pso_settings.settings, rosenbrock_function.objective_function) \
           ).start()
