@@ -155,8 +155,8 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
             # find average and save data
             #avg = sum(values)/len(values)
             #avg = median(values)
-            avg = sum(euclid_distance)/len(euclid_distance)
-            #avg = median(euclid_distance)
+            #avg = sum(euclid_distance)/len(euclid_distance)
+            avg = np.median(euclid_distance)
             tests[test_name] = avg
             if plot:
                 ax1.scatter(i,j,avg)
