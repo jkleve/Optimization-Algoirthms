@@ -126,8 +126,8 @@ class GA(Timer, object):
 
         # denominator in probability of surviving
         den = (max_f - min_f)
-        if den == 0:
-            print("Every organism has same objective function value.")
+        # if den == 0:
+        #     print("Every organism has same objective function value.")
 
         for (i, organism) in enumerate(population):
             f = organism.fitness
@@ -262,8 +262,8 @@ class GA(Timer, object):
         self.plotutils.plot(pts)
 
     def __str__(self):
-        return "Best Fitness: %8.4f by organism %s" % \
-                (self.get_best_f(), str(self.get_best_x()))
+        return "Iteration %d Best Fitness: %8.4f by organism %s" % \
+                (self.num_generations, self.get_best_f(), str(self.get_best_x()))
 
     ####################################
     # These are the only methods that  #
