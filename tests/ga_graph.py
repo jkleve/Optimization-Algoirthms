@@ -24,6 +24,7 @@ def plot_data(x1_info, x2_info, func, zbounds=None):
     x1_name = x1_var.replace('_', ' ').title()
     x2_name = x2_var.replace('_', ' ').title()
 
+    func = func + '_function'
     func_name = func.replace('_', ' ').title()
     title = 'Response Surface of %s vs %s of %s on %s' % (x1_name, x2_name, \
                                                           algorithm_name, func_name)
@@ -57,9 +58,9 @@ def plot_data(x1_info, x2_info, func, zbounds=None):
 if __name__ == "__main__":
 
     # user inputs
-    func = "griewank_function"
-    x1_name = 'selection_cutoff'
-    x2_name = 'mutation_rate'
+    func = 'griewank'
+    x1_name = 'mutation_rate'
+    x2_name = 'max_mutation_amount'
     x1_start = 0.1
     x1_step = 0.1
     x1_end = 1.0
