@@ -15,7 +15,7 @@ import griewank_function
 import ga_settings
 
 from oa_utils import read_xy_data, optimize_settings
-from oa_test_helpers import gen_filename
+from test_helpers import gen_filename
 from regression_utils import get_regression_coef
 
 # def cmp_selection_cutoff_vs_mutation_rate():

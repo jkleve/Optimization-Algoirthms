@@ -6,7 +6,7 @@ import sys
 sys.path.append("../utils")
 
 from oa_utils import read_xy_data
-from oa_test_helpers import gen_filename
+from test_helpers import gen_filename
 from regression_utils import get_regression_coef
 
 input_loc = '../tmp/'

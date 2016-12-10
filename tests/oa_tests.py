@@ -12,7 +12,7 @@ sys.path.append('../functions')
 sys.path.append('../utils')
 
 from oa_utils import optimize_settings, write_xy_data
-from oa_test_helpers import gen_filename
+from test_helpers import gen_filename
 import regression_utils
 
 from genetic_algorithm import GA
