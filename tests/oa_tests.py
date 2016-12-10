@@ -137,13 +137,13 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                 values.append(algorithm.get_best_x().get_fval())
                 # euclidean distance
                 squares = 0
-                for square in algorithm.get_best_x().pos:
+                for pos in algorithm.get_best_x().pos:
                     if o_function == rosenbrock_function.objective_function:
-                        squares += (square-1)**2
+                        squares += (pos - 1)**2
                     elif o_function == easom_function.objective_function:
-                        squares += (square-np.pi)**2
+                        squares += (pos - np.pi)**2
                     else:
-                        squares += square**2
+                        squares += pos**2
                 euclid_distance.append(np.sqrt(squares))
 
             # save histogram if true
@@ -229,12 +229,17 @@ def ga_data_points(o_algorithm, settings, o_function):
                                population_size=20, num_tests_per_point=10, plot=True, \
                                save_histograms=False, response_surface=False \
                               )
-        except TypeError:
-            print("Type Error??? :(")
-        except ValueError:
-            print("Value Error??? :(")
-        except:
+        except Exception:
+            import traceback
             print("Error ??? :(")
+
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback, limit=1, file=sys.stdout)
+            print("*** print_exception:")
+            traceback.print_exception(exc_type, exc_value, exc_traceback, \
+                                      limit=2, file=sys.stdout)
+
+        sys.exit()
 
     print(" === %s took %d seconds === " % (o_function.func_globals['__name__'], \
                                             time.time() - start_time))
@@ -265,7 +270,7 @@ if __name__ == "__main__":
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
     #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
-    #ga_data_points(GA, ga_settings.settings, griewank_function.objective_function)
+    #ga_data_points(GA, ga_settings.settings, easom_function.objective_function)
     #sys.exit()
 
     # ackley
