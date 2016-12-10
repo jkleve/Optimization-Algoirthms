@@ -4,5 +4,4 @@ local_settings.py
 tests.txt
 plot_surface.py
 TODO
-*.png
-*.dat
+*.swp
