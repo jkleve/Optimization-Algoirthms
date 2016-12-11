@@ -212,6 +212,10 @@ class PSO(Timer, object):
             self.do_loop()
             time.sleep(self.settings['time_delay'])
 
+    @staticmethod
+    def get_name():
+        return "Particle Swarm"
+
 ########################################################################################
 #                                     MAIN                                             #
 ########################################################################################

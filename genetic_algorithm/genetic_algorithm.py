@@ -343,6 +343,10 @@ class GA(Timer, object):
             if self.settings['print_actions'] or self.settings['print_iterations']:
                 print("Maximum number of iterations hit (%d)" % self.num_generations)
 
+    @staticmethod
+    def get_name():
+        return "Genetic Algorithm"
+
 
 ########################################################################################
 #                                     MAIN                                             #
