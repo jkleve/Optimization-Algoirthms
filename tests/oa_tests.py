@@ -262,7 +262,7 @@ def ga_data_points(o_algorithm, settings, o_function):
 
 
     output_str = " === %s took %d seconds === " % (o_function.func_globals['__name__'], \
-                                                   time.time() - start_time))
+                                                   time.time() - start_time)
     subprocess.call(['text', output_str])
     print(output_str)
 
