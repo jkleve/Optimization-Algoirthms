@@ -473,22 +473,22 @@ if __name__ == "__main__":
     #func_val_vs_iterations(OptimizationAlgorithm, num_particles)
 
     #pso_data_points(PSO, pso_settings.settings, rosenbrock_function.objective_function)
-    ga_data_points(GA, ga_settings.settings, easom_function.objective_function)
-    sys.exit()
+    #ga_data_points(GA, ga_settings.settings, easom_function.objective_function)
+    #sys.exit()
 
-#    # ackley
-#    Process( target = ga_data_points, \
-#            args = (GA, ga_ackley_settings.settings, ackley_function.objective_function) \
-#          ).start()
-#    # easom
-#    Process( target = ga_data_points, \
-#            args = (GA, ga_settings.settings, easom_function.objective_function) \
-#          ).start()
-#    # griewank
-#    Process( target = ga_data_points, \
-#            args = (GA, ga_settings.settings, griewank_function.objective_function) \
-#          ).start()
-#    # rosenbrock
-#    Process( target = ga_data_points, \
-#            args = (GA, ga_settings.settings, rosenbrock_function.objective_function) \
-#          ).start()
+    # ackley
+    Process( target = ga_data_points, \
+            args = (GA, ga_ackley_settings.settings, ackley_function.objective_function) \
+          ).start()
+    # easom
+    Process( target = ga_data_points, \
+            args = (GA, ga_settings.settings, easom_function.objective_function) \
+          ).start()
+    # griewank
+    Process( target = ga_data_points, \
+            args = (GA, ga_settings.settings, griewank_function.objective_function) \
+          ).start()
+    # rosenbrock
+    Process( target = ga_data_points, \
+            args = (GA, ga_settings.settings, rosenbrock_function.objective_function) \
+          ).start()
