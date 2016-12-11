@@ -5,6 +5,7 @@ import numpy as np
 from multiprocessing import Process
 from scipy.optimize import minimize
 
+import subprocess
 import time
 import sys
 sys.path.append('../genetic_algorithm')
@@ -259,8 +260,11 @@ def ga_data_points(o_algorithm, settings, o_function):
                                       limit=2, file=sys.stdout)
 
 
-    print(" === %s took %d seconds === " % (o_function.func_globals['__name__'], \
-                                            time.time() - start_time))
+
+    output_str = " === %s took %d seconds === " % (o_function.func_globals['__name__'], \
+                                                   time.time() - start_time))
+    subprocess.call(['text', output_str])
+    print(output_str)
 
 def objective_3d_function(x):
     b = [ 3.44203965, 0.67407314, -2.50195918, -2.4948652, -1.51992894, \
