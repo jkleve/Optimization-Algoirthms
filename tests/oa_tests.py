@@ -244,7 +244,7 @@ def ga_data_points(o_algorithm, settings, o_function):
                                population_size=20, num_tests_per_point=100, plot=False, \
                                save_histograms=False, response_surface=False \
                               )
-                fname = 'cutoff_vs_rate_(mma:%f)_%s.dat' % \
+                fname = 'cutoff_vs_rate_(mma_%.2f)_%s.dat' % \
                     (k, func_name)
                 write_xy_data(X, y, fname)
 
