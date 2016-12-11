@@ -220,10 +220,10 @@ def ga_data_points(o_algorithm, settings, o_function):
 
     x1_start = 0.1
     x1_step = 0.1
-    x1_end = 0.1
+    x1_end = 1.0
     x2_start = 0.1
     x2_step = 0.1
-    x2_end = 0.1
+    x2_end = 1.0
 
 
     for k in np.arange(0.1, 1.0, 0.1):
