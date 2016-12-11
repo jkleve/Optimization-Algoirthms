@@ -247,7 +247,6 @@ def ga_data_points(o_algorithm, settings, o_function):
                 fname = 'cutoff_vs_rate_(mma:%d)_%s.dat' % \
                     (k, func_name)
                 write_xy_data(X, y, fname)
-                sys.exit()
 
             except Exception:
                 import traceback
