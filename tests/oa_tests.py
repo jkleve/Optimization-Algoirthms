@@ -130,7 +130,7 @@ def get_two_d_accuracy(o_algorithm, o_settings, o_function, \
                         'mutation_rate' + '(' + str(o_settings['mutation_rate']) + ')' + ',' + \
                         'max_mutation_amount' + '(' + str(o_settings['max_mutation_amount']) + ')'
 
-            print("Running test %s" % test_name)
+            print("Running test %s on %s" % (test_name, func_name))
 
             # create histogram plot if true
             if save_histograms:
