@@ -183,6 +183,8 @@ class GA(Timer, object):
         max_f = population[length-1].fitness
         min_f = population[0].fitness
 
+        den = max_f - min_f
+
         # if size is odd
         if size % 2 == 1:
             raise ValueError("Populations with an odd size hasn't been implemented. Talk to Jesse")
@@ -192,7 +194,10 @@ class GA(Timer, object):
         probabilities = []
         normalized_sum = 0.0
         for o in population:
-            normalized_f = (max_f - o.fitness)/(max_f - min_f)
+            if den == 0:
+                normalized_f = 1
+            else:
+                normalized_f = (max_f - o.fitness)/den
             normalized_sum += normalized_f
             probabilities.append({'normalized_f': normalized_f})
 
