@@ -32,6 +32,12 @@ def pause():
     else:
         raw_input("Waiting for Enter to be pressed ...")
 
+def get_char():
+    if PY3:
+        return input("> ")
+    else:
+        return raw_input("> ")
+
 def count_num_lines(filename):
     with open(filename) as f:
         for i, l in enumerate(f):

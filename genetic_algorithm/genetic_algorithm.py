@@ -90,6 +90,9 @@ class GA(Timer, object):
         if settings['step_through']:
             oa_utils.pause()
 
+#    def __del__(self):
+#        del(self.plotutils)
+#
     @staticmethod
     def __gen_organism(id, bounds, function):
         # use gen_random_numbers to get a list of positions within the bounds
@@ -255,6 +258,7 @@ class GA(Timer, object):
                           (str(organism), new_pos_str))
 
                 organism.pos = new_pos
+                organism.fitness = organism.get_fval()
 
         return population
 
@@ -346,7 +350,6 @@ class GA(Timer, object):
     @staticmethod
     def get_name():
         return "Genetic Algorithm"
-
 
 ########################################################################################
 #                                     MAIN                                             #

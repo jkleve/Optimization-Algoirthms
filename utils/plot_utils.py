@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt # plotting
 import matplotlib.mlab as mlab
 import numpy as np
+np.seterr(divide='ignore', invalid='ignore') # TODO FIX!!!
 
 import sys
 sys.path.append("../functions")
@@ -46,7 +47,7 @@ class PlotUtils:
         else:
             CS = plt.contour(X, Y, Z)
         plt.clabel(CS, inline=1, fontsize=10)
-        plt.title('Simplest default with labels')
+        #plt.title('Simplest default with labels')
 
         xlim_l = bounds[0][0]
         xlim_u = bounds[0][1]
@@ -54,6 +55,9 @@ class PlotUtils:
         ylim_u = bounds[1][1]
         self.ax.set_xlim(xlim_l, xlim_u)
         self.ax.set_ylim(ylim_l, ylim_u)
+
+    def __del__(self):
+        plt.close(self.fig)
 
     def plot(self, points):
         x1 = [point[0] for point in points]

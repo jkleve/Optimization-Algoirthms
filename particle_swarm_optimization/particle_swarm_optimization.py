@@ -186,6 +186,11 @@ class PSO(Timer, object):
                                     self.k,                         \
                                     self.settings['weight'])
 
+        if self.settings['cg_plus']:
+            self.settings['cg'] += 0.1
+            phi = max(self.settings['cp'] + self.settings['cg'], 4.0)
+            self.k = 2.0/abs(2.0 - phi - sqrt(phi*phi - 4.0*phi))
+
         population = PSO.__update_position(population)
 
         self.num_iterations += 1

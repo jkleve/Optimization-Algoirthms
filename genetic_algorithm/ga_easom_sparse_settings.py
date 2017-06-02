@@ -1,17 +1,17 @@
 settings = {
-    'num_iterations': 100,
-    'population_size': 100, # number of organisms
+    'num_iterations': 500,
+    'population_size': 50, # number of organisms
     'stopping_criteria': 0.001,
     'num_iter_stop_criteria': 100,
     'number_of_dimensions': 2,
     'bounds': [ # this must have 1 pair per dimension
-        (-10,10),
-        (-10,10)
+        (-50,50),
+        (-50,50)
     ],
 
-    'selection_cutoff': 0.7,
+    'selection_cutoff': 0.8,
     'mutation_rate': 0.3, # how often a mutation happens (between 0 and 1)
-    'max_mutation_amount': 1.0, # how large of a mutation is allowed (between 0 and 1)
+    'max_mutation_amount': 10.0, # how large of a mutation is allowed (between 0 and 1)
 
     'time_delay': 0.0,
     'step_through': False, # whether it should pause after each iteration

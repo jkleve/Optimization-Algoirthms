@@ -14,6 +14,7 @@ import pso_settings
 
 import ackley_function
 import easom_function
+import griewank_function
 import rosenbrock_function
 
 def num_parts_vs_time(o_algorithm, settings, o_function, num_particles, plot=False):
@@ -89,6 +90,7 @@ def cmp_num_parts_vs_time(o_algorithm1, o_algorithm2, \
     acc_ax.plot(num_particles, accuracy2, 'r-')
     acc_ax.legend(['GA', 'PSO'])
 
+    plt.ylim(0, 1)
     plt.show()
 
     return (times1, times2)
@@ -183,20 +185,28 @@ def cmp_num_dims_vs_time(o_algorithm1, o_algorithm2, \
     return (times1, times2)
 
 if __name__ == "__main__":
+    bounds = [(-10,10), (-10,10)]
+
     ga_algorithm = genetic_algorithm.GA
     ga_s = ga_settings.settings
     ga_s['num_iterations'] = 100
     ga_s['num_particles'] = 50
+    ga_s['number_of_dimensions'] = 2
+    ga_s['bounds'] = bounds
 
     pso_algorithm = particle_swarm_optimization.PSO
     pso_s = pso_settings.settings
     pso_s['num_iterations'] = 100
     pso_s['num_particles'] = 50
+    pso_s['number_of_dimensions'] = 2
+    pso_s['bounds'] = bounds
 
     o_function = ackley_function.objective_function
-    num_particles = [10, 50, 100, 250, 500, 1000, 2000]
+    num_particles = [10, 20, 30, 40, 50, 100]
     #num_parts_vs_time(pso_algorithm, pso_s, o_function, num_particles, True)
-    #cmp_num_parts_vs_time(ga_algorithm, pso_algorithm, ga_s, pso_s, o_function, num_particles)
+    cmp_num_parts_vs_time(ga_algorithm, pso_algorithm, ga_s, pso_s, o_function, num_particles)
+
+    sys.exit()
 
     num_dims = [2, 5, 10, 25, 50]
     #num_dims_vs_time(ga_algorithm, ga_s, o_function, num_dims, True)
